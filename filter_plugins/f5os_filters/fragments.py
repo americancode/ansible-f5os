@@ -57,10 +57,11 @@ def aggregate_settings_fragments(
 def classify_fragment_operations(items: list[dict[str, Any]], operation: str) -> list[dict[str, Any]]:
     """Filter fragment items into present or delete runtime collections."""
     normalized_operation = operation.strip().lower()
-    target_state = "present" if normalized_operation == "present" else "absent"
     filtered: list[dict[str, Any]] = []
     for item in items or []:
         state = str((item or {}).get("state", "present")).strip().lower()
-        if state == target_state:
+        if normalized_operation == "present" and state != "absent":
+            filtered.append(item)
+        if normalized_operation != "present" and state == "absent":
             filtered.append(item)
     return filtered

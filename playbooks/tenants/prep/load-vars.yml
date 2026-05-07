@@ -1,0 +1,86 @@
+# Tenants variable loader.
+# Builds aggregated raw collections from the tenants var tree and deletion tree.
+---
+- name: Load tenant fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "tenants"
+    source_root: "{{ repo_root }}/vars/tenants/tenants"
+    deletion_root: "{{ repo_root }}/vars/tenants/deletions/tenants"
+    fragment_var_name: "tenant_fragment"
+    aggregate_var: "tenants_aggregate"
+    deletion_aggregate_var: "tenants_delete_aggregate"
+    collection_key: "tenants"
+    defaults_key: "tenant_defaults"
+
+- name: Load tenant console fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "tenant console"
+    source_root: "{{ repo_root }}/vars/tenants/tenant_console"
+    deletion_root: "{{ repo_root }}/vars/tenants/deletions/tenant_console"
+    fragment_var_name: "tenant_console_fragment"
+    aggregate_var: "tenant_console_aggregate"
+    deletion_aggregate_var: "tenant_console_delete_aggregate"
+    collection_key: "tenant_console_users"
+    defaults_key: "tenant_console_defaults"
+
+- name: Load tenant wait fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "tenant waits"
+    source_root: "{{ repo_root }}/vars/tenants/tenant_wait"
+    deletion_root: "{{ repo_root }}/vars/tenants/deletions/tenant_wait"
+    fragment_var_name: "tenant_wait_fragment"
+    aggregate_var: "tenant_wait_aggregate"
+    deletion_aggregate_var: "tenant_wait_delete_aggregate"
+    collection_key: "tenant_waits"
+    defaults_key: "tenant_wait_defaults"
+
+- name: Load VELOS partition fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "velos partitions"
+    source_root: "{{ repo_root }}/vars/tenants/velos_partitions"
+    deletion_root: "{{ repo_root }}/vars/tenants/deletions/velos_partitions"
+    fragment_var_name: "velos_partition_fragment"
+    aggregate_var: "velos_partitions_aggregate"
+    deletion_aggregate_var: "velos_partitions_delete_aggregate"
+    collection_key: "velos_partitions"
+    defaults_key: "velos_partition_defaults"
+
+- name: Load VELOS partition password fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "velos partition password changes"
+    source_root: "{{ repo_root }}/vars/tenants/velos_partition_passwords"
+    deletion_root: "{{ repo_root }}/vars/tenants/deletions/velos_partition_passwords"
+    fragment_var_name: "velos_partition_password_fragment"
+    aggregate_var: "velos_partition_passwords_aggregate"
+    deletion_aggregate_var: "velos_partition_passwords_delete_aggregate"
+    collection_key: "velos_partition_password_changes"
+    defaults_key: "velos_partition_password_change_defaults"
+
+- name: Load VELOS partition HA fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "velos partition ha"
+    source_root: "{{ repo_root }}/vars/tenants/velos_partition_ha"
+    deletion_root: "{{ repo_root }}/vars/tenants/deletions/velos_partition_ha"
+    fragment_var_name: "velos_partition_ha_fragment"
+    aggregate_var: "velos_partition_ha_aggregate"
+    deletion_aggregate_var: "velos_partition_ha_delete_aggregate"
+    collection_key: "velos_partition_ha_configs"
+    defaults_key: "velos_partition_ha_defaults"
+
+- name: Load VELOS partition wait fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "velos partition waits"
+    source_root: "{{ repo_root }}/vars/tenants/velos_partition_wait"
+    deletion_root: "{{ repo_root }}/vars/tenants/deletions/velos_partition_wait"
+    fragment_var_name: "velos_partition_wait_fragment"
+    aggregate_var: "velos_partition_wait_aggregate"
+    deletion_aggregate_var: "velos_partition_wait_delete_aggregate"
+    collection_key: "velos_partition_waits"
+    defaults_key: "velos_partition_wait_defaults"

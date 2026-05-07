@@ -1,0 +1,38 @@
+# Software lifecycle runtime builder.
+# Shapes aggregated fragments into final present/delete collections consumed by audit and runtime tasks.
+---
+- name: Classify system image operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system images"
+    source_items: "{{ system_images_aggregate | default([]) }}"
+    source_delete_items: "{{ system_images_delete_aggregate | default([]) }}"
+    present_var: "system_images_present"
+    delete_var: "system_images_delete"
+
+- name: Classify system install operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system installs"
+    source_items: "{{ system_installs_aggregate | default([]) }}"
+    source_delete_items: "{{ system_installs_delete_aggregate | default([]) }}"
+    present_var: "system_installs_present"
+    delete_var: "system_installs_delete"
+
+- name: Classify tenant image operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "tenant images"
+    source_items: "{{ tenant_images_aggregate | default([]) }}"
+    source_delete_items: "{{ tenant_images_delete_aggregate | default([]) }}"
+    present_var: "tenant_images_present"
+    delete_var: "tenant_images_delete"
+
+- name: Classify VELOS partition image operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "velos partition images"
+    source_items: "{{ velos_partition_images_aggregate | default([]) }}"
+    source_delete_items: "{{ velos_partition_images_delete_aggregate | default([]) }}"
+    present_var: "velos_partition_images_present"
+    delete_var: "velos_partition_images_delete"

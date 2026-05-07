@@ -9,3 +9,5 @@ Start here for the repo structure and implementation status.
 - [system.md](system.md)
 - [network.md](network.md)
 - [qos.md](qos.md)
+- [tenants.md](tenants.md)
+- [software_lifecycle.md](software_lifecycle.md)

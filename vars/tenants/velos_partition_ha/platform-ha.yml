@@ -1,0 +1,11 @@
+---
+# VELOS partition HA examples for preferred controller and auto-failback policy.
+# These objects are consumed by `velos_partition_ha_config`.
+# Supported fields: `name`, `prefer_node`, `auto_failback`, and `platform`.
+velos_partition_ha_configs:
+  - name: edge-partition-a
+    prefer_node: prefer-1
+    auto_failback:
+      enabled: true
+      failback_delay: 60
+    platform: velos-controller

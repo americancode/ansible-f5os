@@ -1,0 +1,65 @@
+# Tenants runtime builder.
+# Shapes aggregated fragments into final present/delete collections consumed by audit and runtime tasks.
+---
+- name: Classify tenant operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "tenants"
+    source_items: "{{ tenants_aggregate | default([]) }}"
+    source_delete_items: "{{ tenants_delete_aggregate | default([]) }}"
+    present_var: "tenants_present"
+    delete_var: "tenants_delete"
+
+- name: Classify tenant console operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "tenant console"
+    source_items: "{{ tenant_console_aggregate | default([]) }}"
+    source_delete_items: "{{ tenant_console_delete_aggregate | default([]) }}"
+    present_var: "tenant_console_present"
+    delete_var: "tenant_console_delete"
+
+- name: Classify tenant wait operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "tenant waits"
+    source_items: "{{ tenant_wait_aggregate | default([]) }}"
+    source_delete_items: "{{ tenant_wait_delete_aggregate | default([]) }}"
+    present_var: "tenant_wait_present"
+    delete_var: "tenant_wait_delete"
+
+- name: Classify VELOS partition operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "velos partitions"
+    source_items: "{{ velos_partitions_aggregate | default([]) }}"
+    source_delete_items: "{{ velos_partitions_delete_aggregate | default([]) }}"
+    present_var: "velos_partitions_present"
+    delete_var: "velos_partitions_delete"
+
+- name: Classify VELOS partition password operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "velos partition password changes"
+    source_items: "{{ velos_partition_passwords_aggregate | default([]) }}"
+    source_delete_items: "{{ velos_partition_passwords_delete_aggregate | default([]) }}"
+    present_var: "velos_partition_passwords_present"
+    delete_var: "velos_partition_passwords_delete"
+
+- name: Classify VELOS partition HA operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "velos partition ha"
+    source_items: "{{ velos_partition_ha_aggregate | default([]) }}"
+    source_delete_items: "{{ velos_partition_ha_delete_aggregate | default([]) }}"
+    present_var: "velos_partition_ha_present"
+    delete_var: "velos_partition_ha_delete"
+
+- name: Classify VELOS partition wait operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "velos partition waits"
+    source_items: "{{ velos_partition_wait_aggregate | default([]) }}"
+    source_delete_items: "{{ velos_partition_wait_delete_aggregate | default([]) }}"
+    present_var: "velos_partition_wait_present"
+    delete_var: "velos_partition_wait_delete"

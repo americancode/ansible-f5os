@@ -8,6 +8,8 @@ Current domain roots:
 - `vars/system/`
 - `vars/network/`
 - `vars/qos/`
+- `vars/tenants/`
+- `vars/software_lifecycle/`
 
 Each domain has:
 

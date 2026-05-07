@@ -1,0 +1,42 @@
+# Tenants audit tasks.
+# Runtime effect: prints planned tenant delete/apply collections before any F5OS module calls.
+---
+- name: Announce tenants audit mode
+  ansible.builtin.debug:
+    msg:
+      - "AUDIT MODE tenants for {{ inventory_hostname }} -> {{ provider.server }}"
+      - "No F5OS changes will be made."
+
+- name: Print tenants delete collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "DELETE"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "tenants_delete", items: "{{ tenants_delete | default([]) }}" }
+    - { name: "tenant_console_delete", items: "{{ tenant_console_delete | default([]) }}" }
+    - { name: "tenant_wait_delete", items: "{{ tenant_wait_delete | default([]) }}" }
+    - { name: "velos_partitions_delete", items: "{{ velos_partitions_delete | default([]) }}" }
+    - { name: "velos_partition_passwords_delete", items: "{{ velos_partition_passwords_delete | default([]) }}" }
+    - { name: "velos_partition_ha_delete", items: "{{ velos_partition_ha_delete | default([]) }}" }
+    - { name: "velos_partition_wait_delete", items: "{{ velos_partition_wait_delete | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Print tenants apply collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "APPLY"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "tenants_present", items: "{{ tenants_present | default([]) }}" }
+    - { name: "tenant_console_present", items: "{{ tenant_console_present | default([]) }}" }
+    - { name: "tenant_wait_present", items: "{{ tenant_wait_present | default([]) }}" }
+    - { name: "velos_partitions_present", items: "{{ velos_partitions_present | default([]) }}" }
+    - { name: "velos_partition_passwords_present", items: "{{ velos_partition_passwords_present | default([]) }}" }
+    - { name: "velos_partition_ha_present", items: "{{ velos_partition_ha_present | default([]) }}" }
+    - { name: "velos_partition_wait_present", items: "{{ velos_partition_wait_present | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"

@@ -64,6 +64,15 @@
     present_var: "system_auth_servers_present"
     delete_var: "system_auth_servers_delete"
 
+- name: Classify system auth LDAP operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system auth ldap"
+    source_items: "{{ system_auth_ldap_aggregate | default([]) }}"
+    source_delete_items: "{{ system_auth_ldap_delete_aggregate | default([]) }}"
+    present_var: "system_auth_ldap_present"
+    delete_var: "system_auth_ldap_delete"
+
 - name: Classify system user operations
   ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
   vars:
@@ -99,3 +108,12 @@
     source_delete_items: "{{ system_snmp_delete_aggregate | default([]) }}"
     present_var: "system_snmp_present"
     delete_var: "system_snmp_delete"
+
+- name: Classify system imported TLS operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system imported tls"
+    source_items: "{{ system_imported_tls_aggregate | default([]) }}"
+    source_delete_items: "{{ system_imported_tls_delete_aggregate | default([]) }}"
+    present_var: "system_imported_tls_present"
+    delete_var: "system_imported_tls_delete"

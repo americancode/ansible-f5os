@@ -1,0 +1,9 @@
+---
+# System image import examples for F5OS platform software bundles.
+# Supported fields: `remote_image_url`, `local_path`, `operation_id`, `remote_user`,
+# `remote_password`, `timeout`, and `state`.
+system_images:
+  - remote_image_url: https://images.example.net/f5/F5OS-A-1.8.0-14139.R5R10.CANDIDATE.iso
+    local_path: images/staging
+    state: import
+    timeout: 900

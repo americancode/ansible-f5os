@@ -1,0 +1,102 @@
+# Tenants apply tasks.
+# Runtime effect: applies F5OS tenants on rSeries/VELOS partitions and VELOS partition lifecycle objects on the controller.
+---
+- name: Apply VELOS partitions
+  velos_partition:
+    name: "{{ item.name }}"
+    configuration_volume: "{{ item.configuration_volume | default(omit) }}"
+    images_volume: "{{ item.images_volume | default(omit) }}"
+    ipv4_mgmt_address: "{{ item.ipv4_mgmt_address | default(omit) }}"
+    ipv4_mgmt_gateway: "{{ item.ipv4_mgmt_gateway | default(omit) }}"
+    ipv6_mgmt_address: "{{ item.ipv6_mgmt_address | default(omit) }}"
+    ipv6_mgmt_gateway: "{{ item.ipv6_mgmt_gateway | default(omit) }}"
+    os_version: "{{ item.os_version | default(omit) }}"
+    shared_volume: "{{ item.shared_volume | default(omit) }}"
+    slots: "{{ item.slots | default(omit) }}"
+    state: present
+    wait_time: "{{ item.wait_time | default(omit) }}"
+  loop: "{{ velos_partitions_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: (item.platform | default(platform_type)) == 'velos-controller'
+
+- name: Apply VELOS partition HA configuration
+  velos_partition_ha_config:
+    prefer_node: "{{ item.prefer_node }}"
+    auto_failback: "{{ item.auto_failback | default(omit) }}"
+    state: present
+  loop: "{{ velos_partition_ha_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default(item.prefer_node) }}"
+  when: (item.platform | default(platform_type)) == 'velos-controller'
+
+- name: Apply VELOS partition password changes
+  velos_partition_change_password:
+    user_name: "{{ item.user_name }}"
+    old_password: "{{ item.old_password }}"
+    new_password: "{{ item.new_password }}"
+  loop: "{{ velos_partition_passwords_present | default([]) }}"
+  loop_control:
+    label: "{{ item.user_name }}"
+  when: (item.platform | default(platform_type)) == 'velos-controller'
+
+- name: Wait for VELOS partitions
+  velos_partition_wait:
+    name: "{{ item.name }}"
+    delay: "{{ item.delay | default(omit) }}"
+    msg: "{{ item.msg | default(omit) }}"
+    sleep: "{{ item.sleep | default(omit) }}"
+    state: "{{ item.state | default(omit) }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+  loop: "{{ velos_partition_wait_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: (item.platform | default(platform_type)) == 'velos-controller'
+
+- name: Apply tenants
+  f5os_tenant:
+    name: "{{ item.name }}"
+    cpu_cores: "{{ item.cpu_cores | default(omit) }}"
+    cryptos: "{{ item.cryptos | default(omit) }}"
+    dag_ipv6_prefix_length: "{{ item.dag_ipv6_prefix_length | default(omit) }}"
+    deployment_file: "{{ item.deployment_file | default(omit) }}"
+    image_name: "{{ item.image_name | default(omit) }}"
+    mac_block_size: "{{ item.mac_block_size | default(omit) }}"
+    memory: "{{ item.memory | default(omit) }}"
+    mgmt_gateway: "{{ item.mgmt_gateway | default(omit) }}"
+    mgmt_ip: "{{ item.mgmt_ip | default(omit) }}"
+    mgmt_prefix: "{{ item.mgmt_prefix | default(omit) }}"
+    nodes: "{{ item.nodes }}"
+    running_state: "{{ item.running_state | default(omit) }}"
+    type: "{{ item.type | default(omit) }}"
+    virtual_disk_size: "{{ item.virtual_disk_size | default(omit) }}"
+    vlans: "{{ item.vlans | default(omit) }}"
+    state: present
+  loop: "{{ tenants_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: (item.platform | default(platform_type)) != 'velos-controller'
+
+- name: Apply tenant console access
+  f5os_tenant_console_enable:
+    tenant_username: "{{ item.tenant_username }}"
+    console_user_password: "{{ item.console_user_password | default(omit) }}"
+    role: "{{ item.role | default(omit) }}"
+    state: "{{ item.state | default(omit) }}"
+  loop: "{{ tenant_console_present | default([]) }}"
+  loop_control:
+    label: "{{ item.tenant_username }}"
+  when: (item.platform | default(platform_type)) != 'velos-controller'
+
+- name: Wait for tenants
+  f5os_tenant_wait:
+    name: "{{ item.name }}"
+    delay: "{{ item.delay | default(omit) }}"
+    msg: "{{ item.msg | default(omit) }}"
+    sleep: "{{ item.sleep | default(omit) }}"
+    state: "{{ item.state | default(omit) }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+  loop: "{{ tenant_wait_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: (item.platform | default(platform_type)) != 'velos-controller'

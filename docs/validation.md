@@ -19,10 +19,15 @@ Current `make validate` behavior:
   - `system`
   - `network`
   - `qos`
+  - `tenants`
+  - `software_lifecycle`
 - runs `ansible-playbook --syntax-check` for:
   - `playbooks/bootstrap.yml`
   - `playbooks/system.yml`
   - `playbooks/network.yml`
+  - `playbooks/qos.yml`
+  - `playbooks/tenants.yml`
+  - `playbooks/software_lifecycle.yml`
 
 Current GitLab CI behavior:
 

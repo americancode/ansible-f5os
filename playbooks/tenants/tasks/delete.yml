@@ -1,0 +1,57 @@
+# Tenants delete tasks.
+# Runtime effect: removes VELOS partitions and F5OS tenants while rejecting non-reversible operational helpers.
+---
+- name: Reject tenant console deletion requests
+  ansible.builtin.assert:
+    that:
+      - (tenant_console_delete | default([]) | length) == 0
+    fail_msg: >-
+      `f5os_tenant_console_enable` does not support `state: absent`.
+      Use explicit `state: locked` in the main tenant console tree instead of deletions.
+
+- name: Reject tenant wait deletion requests
+  ansible.builtin.assert:
+    that:
+      - (tenant_wait_delete | default([]) | length) == 0
+    fail_msg: >-
+      `f5os_tenant_wait` is an operational wait module and does not support deletions.
+
+- name: Reject VELOS partition password deletion requests
+  ansible.builtin.assert:
+    that:
+      - (velos_partition_passwords_delete | default([]) | length) == 0
+    fail_msg: >-
+      `velos_partition_change_password` is not idempotent and does not support deletions.
+
+- name: Reject VELOS partition HA deletion requests
+  ansible.builtin.assert:
+    that:
+      - (velos_partition_ha_delete | default([]) | length) == 0
+    fail_msg: >-
+      `velos_partition_ha_config` supports only `state: present`.
+
+- name: Reject VELOS partition wait deletion requests
+  ansible.builtin.assert:
+    that:
+      - (velos_partition_wait_delete | default([]) | length) == 0
+    fail_msg: >-
+      `velos_partition_wait` is an operational wait module and does not support deletions.
+
+- name: Remove tenants
+  f5os_tenant:
+    name: "{{ item.name }}"
+    nodes: "{{ item.nodes }}"
+    state: absent
+  loop: "{{ tenants_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: (item.platform | default(platform_type)) != 'velos-controller'
+
+- name: Remove VELOS partitions
+  velos_partition:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ velos_partitions_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: (item.platform | default(platform_type)) == 'velos-controller'

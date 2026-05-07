@@ -1,0 +1,12 @@
+---
+# Imported TLS cert/key examples for management-plane services.
+# These objects are consumed by `f5os_import_tls_cert_key`.
+# Supported fields: `name`, `certificate`, `key`, `key_passphrase`, `verify_client`,
+# `verify_client_depth`, and `state`.
+imported_tls_cert_keys:
+  - name: imported-management-ui
+    certificate: "{{ lookup('file', repo_root ~ '/secrets/tls/management-ui.crt') }}"
+    key: "{{ lookup('file', repo_root ~ '/secrets/tls/management-ui.key') }}"
+    verify_client: false
+    verify_client_depth: 0
+    state: present

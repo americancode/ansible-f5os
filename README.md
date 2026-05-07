@@ -8,6 +8,19 @@ Current focus:
 
 - establish the repo structure, docs, and roadmap
 - mirror the reference repo's `playbooks/`, `vars/`, and Python tooling patterns
-- map F5OS modules into canonical domains before implementation starts
+- implement canonical F5OS domains with matching split var trees and validation support
+
+Implemented domains:
+
+- `bootstrap`
+- `system`
+- `network`
+- `qos`
+- `tenants`
+- `software_lifecycle`
+
+Current next domain:
+
+- `observability`
 
 Start with [ROADMAP.md](ROADMAP.md).

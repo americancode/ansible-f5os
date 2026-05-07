@@ -1,0 +1,23 @@
+# Tenants entrypoint.
+# Loads `vars/common.yml` and runs tenants prep before applying canonical tenant and VELOS partition runtime tasks.
+---
+- name: Configure F5OS tenants and VELOS partitions
+  hosts: all
+  connection: httpapi
+  gather_facts: false
+  collections:
+    - f5networks.f5os
+
+  vars:
+    repo_root: "{{ playbook_dir }}/.."
+
+  vars_files:
+    - "{{ repo_root }}/vars/common.yml"
+
+  pre_tasks:
+    - name: Prepare tenant inputs
+      ansible.builtin.import_tasks: tenants/prep.yml
+
+  tasks:
+    - name: Manage tenant objects
+      ansible.builtin.import_tasks: tenants/tasks/manage.yml

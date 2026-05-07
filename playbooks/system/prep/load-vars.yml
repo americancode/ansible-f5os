@@ -85,6 +85,18 @@
     collection_key: "auth_servers"
     defaults_key: "auth_server_defaults"
 
+- name: Load system auth LDAP fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system auth ldap"
+    source_root: "{{ repo_root }}/vars/system/auth_ldap"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/auth_ldap"
+    fragment_var_name: "system_auth_ldap_fragment"
+    aggregate_var: "system_auth_ldap_aggregate"
+    deletion_aggregate_var: "system_auth_ldap_delete_aggregate"
+    collection_key: "auth_ldap_configs"
+    defaults_key: "auth_ldap_defaults"
+
 - name: Load system user fragments
   ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
   vars:
@@ -132,3 +144,15 @@
     deletion_aggregate_var: "system_snmp_delete_aggregate"
     collection_key: "snmp_configs"
     defaults_key: "snmp_defaults"
+
+- name: Load system imported TLS fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system imported tls"
+    source_root: "{{ repo_root }}/vars/system/imported_tls"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/imported_tls"
+    fragment_var_name: "system_imported_tls_fragment"
+    aggregate_var: "system_imported_tls_aggregate"
+    deletion_aggregate_var: "system_imported_tls_delete_aggregate"
+    collection_key: "imported_tls_cert_keys"
+    defaults_key: "imported_tls_defaults"

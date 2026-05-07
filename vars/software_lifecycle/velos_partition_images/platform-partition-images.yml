@@ -1,0 +1,15 @@
+---
+# VELOS partition image import examples for controller-managed chassis partition ISOs.
+# Supported fields: `image_name`, `iso_version`, `protocol`, `remote_host`, `remote_user`,
+# `remote_password`, `remote_path`, `remote_port`, `timeout`, `platform`, and `state`.
+velos_partition_images:
+  - image_name: F5OS-C-1.1.0-3198.PARTITION.iso
+    iso_version: 1.1.0-3198
+    remote_host: images.example.net
+    remote_user: image-reader
+    remote_password: CHANGEME-IMAGE-PASSWORD
+    remote_path: /partition-images/F5OS-C/
+    protocol: scp
+    timeout: 1200
+    platform: velos-controller
+    state: import

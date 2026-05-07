@@ -1,0 +1,7 @@
+---
+# System software install examples for platform-wide or partition-targeted installation.
+# Supported fields: `image_version`, `partition_name`, `timeout`, and `state`.
+system_installs:
+  - image_version: 1.8.0-13846
+    state: install
+    timeout: 900

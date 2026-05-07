@@ -1,0 +1,36 @@
+# Software lifecycle delete tasks.
+# Runtime effect: removes imported images while rejecting unsupported software uninstall requests.
+---
+- name: Reject system install deletion requests
+  ansible.builtin.assert:
+    that:
+      - (system_installs_delete | default([]) | length) == 0
+    fail_msg: >-
+      `f5os_system_image_install` documents `state: absent` as unsupported.
+      Do not use the deletions tree for system install objects.
+
+- name: Remove system images
+  f5os_system_image_import:
+    remote_image_url: "{{ item.remote_image_url }}"
+    state: absent
+  loop: "{{ system_images_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.remote_image_url }}"
+
+- name: Remove tenant images
+  f5os_tenant_image:
+    image_name: "{{ item.image_name }}"
+    state: absent
+  loop: "{{ tenant_images_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.image_name }}"
+  when: (item.platform | default(platform_type)) != 'velos-controller'
+
+- name: Remove VELOS partition images
+  velos_partition_image:
+    image_name: "{{ item.image_name }}"
+    state: absent
+  loop: "{{ velos_partition_images_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.image_name }}"
+  when: (item.platform | default(platform_type)) == 'velos-controller'

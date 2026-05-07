@@ -1,0 +1,10 @@
+---
+# Tenant console access examples for managing the `tenant-console` account.
+# These objects reference tenant names from `vars/tenants/tenants/`.
+# Supported fields: `tenant_username`, `console_user_password`, `role`, `state`, and `platform`.
+tenant_console_users:
+  - tenant_username: appstack-a
+    console_user_password: CHANGEME-TENANT-CONSOLE
+    role: tenant-console
+    state: enabled
+    platform: rseries

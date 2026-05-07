@@ -1,0 +1,59 @@
+# Software lifecycle apply tasks.
+# Runtime effect: imports images and starts or checks software installation workflows.
+---
+- name: Manage system image imports
+  f5os_system_image_import:
+    remote_image_url: "{{ item.remote_image_url }}"
+    local_path: "{{ item.local_path | default(omit) }}"
+    operation_id: "{{ item.operation_id | default(omit) }}"
+    remote_password: "{{ item.remote_password | default(omit) }}"
+    remote_user: "{{ item.remote_user | default(omit) }}"
+    state: "{{ item.state | default('import') }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+  loop: "{{ system_images_present | default([]) }}"
+  loop_control:
+    label: "{{ item.remote_image_url }}"
+
+- name: Manage system software installs
+  f5os_system_image_install:
+    image_version: "{{ item.image_version }}"
+    partition_name: "{{ item.partition_name | default(omit) }}"
+    state: "{{ item.state | default('install') }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+  loop: "{{ system_installs_present | default([]) }}"
+  loop_control:
+    label: "{{ item.partition_name | default('platform') }}:{{ item.image_version }}"
+
+- name: Manage tenant images
+  f5os_tenant_image:
+    image_name: "{{ item.image_name }}"
+    local_path: "{{ item.local_path | default(omit) }}"
+    protocol: "{{ item.protocol | default(omit) }}"
+    remote_host: "{{ item.remote_host | default(omit) }}"
+    remote_password: "{{ item.remote_password | default(omit) }}"
+    remote_path: "{{ item.remote_path | default(omit) }}"
+    remote_port: "{{ item.remote_port | default(omit) }}"
+    remote_user: "{{ item.remote_user | default(omit) }}"
+    state: "{{ item.state | default('import') }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+  loop: "{{ tenant_images_present | default([]) }}"
+  loop_control:
+    label: "{{ item.image_name }}"
+  when: (item.platform | default(platform_type)) != 'velos-controller'
+
+- name: Manage VELOS partition images
+  velos_partition_image:
+    image_name: "{{ item.image_name }}"
+    iso_version: "{{ item.iso_version | default(omit) }}"
+    protocol: "{{ item.protocol | default(omit) }}"
+    remote_host: "{{ item.remote_host | default(omit) }}"
+    remote_password: "{{ item.remote_password | default(omit) }}"
+    remote_path: "{{ item.remote_path | default(omit) }}"
+    remote_port: "{{ item.remote_port | default(omit) }}"
+    remote_user: "{{ item.remote_user | default(omit) }}"
+    state: "{{ item.state | default('import') }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+  loop: "{{ velos_partition_images_present | default([]) }}"
+  loop_control:
+    label: "{{ item.image_name }}"
+  when: (item.platform | default(platform_type)) == 'velos-controller'

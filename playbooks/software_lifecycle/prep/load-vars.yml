@@ -1,0 +1,50 @@
+# Software lifecycle variable loader.
+# Builds aggregated raw collections from the software lifecycle var tree and deletion tree.
+---
+- name: Load system image fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system images"
+    source_root: "{{ repo_root }}/vars/software_lifecycle/system_images"
+    deletion_root: "{{ repo_root }}/vars/software_lifecycle/deletions/system_images"
+    fragment_var_name: "system_image_fragment"
+    aggregate_var: "system_images_aggregate"
+    deletion_aggregate_var: "system_images_delete_aggregate"
+    collection_key: "system_images"
+    defaults_key: "system_image_defaults"
+
+- name: Load system install fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system installs"
+    source_root: "{{ repo_root }}/vars/software_lifecycle/system_installs"
+    deletion_root: "{{ repo_root }}/vars/software_lifecycle/deletions/system_installs"
+    fragment_var_name: "system_install_fragment"
+    aggregate_var: "system_installs_aggregate"
+    deletion_aggregate_var: "system_installs_delete_aggregate"
+    collection_key: "system_installs"
+    defaults_key: "system_install_defaults"
+
+- name: Load tenant image fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "tenant images"
+    source_root: "{{ repo_root }}/vars/software_lifecycle/tenant_images"
+    deletion_root: "{{ repo_root }}/vars/software_lifecycle/deletions/tenant_images"
+    fragment_var_name: "tenant_image_fragment"
+    aggregate_var: "tenant_images_aggregate"
+    deletion_aggregate_var: "tenant_images_delete_aggregate"
+    collection_key: "tenant_images"
+    defaults_key: "tenant_image_defaults"
+
+- name: Load VELOS partition image fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "velos partition images"
+    source_root: "{{ repo_root }}/vars/software_lifecycle/velos_partition_images"
+    deletion_root: "{{ repo_root }}/vars/software_lifecycle/deletions/velos_partition_images"
+    fragment_var_name: "velos_partition_image_fragment"
+    aggregate_var: "velos_partition_images_aggregate"
+    deletion_aggregate_var: "velos_partition_images_delete_aggregate"
+    collection_key: "velos_partition_images"
+    defaults_key: "velos_partition_image_defaults"

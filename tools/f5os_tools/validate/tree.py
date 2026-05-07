@@ -38,9 +38,12 @@ def collect_objects(
     directory: Path,
     collection_key: str,
     result: ValidationResult,
+    allowed_states: set[str] | None = None,
 ) -> list[tuple[Path, dict[str, Any]]]:
     """Load collection objects from all non-settings files in one var tree."""
     objects: list[tuple[Path, dict[str, Any]]] = []
+    enforce_states = allowed_states is not None
+    effective_allowed_states = allowed_states if enforce_states else set()
     for path in yaml_files(directory):
         if path.name == "settings.yml":
             validate_settings_file(path, result)
@@ -63,8 +66,13 @@ def collect_objects(
                 result.add_error(path, f"`{collection_key}[{index}]` must be a mapping")
                 continue
             state = item.get("state", "present")
-            if state not in {"present", "absent"}:
-                result.add_error(path, f"`state` must be `present` or `absent`, got `{state}`", item.get("name"))
+            if enforce_states and state not in effective_allowed_states:
+                allowed_state_text = ", ".join(f"`{value}`" for value in sorted(effective_allowed_states))
+                result.add_error(
+                    path,
+                    f"`state` must be one of {allowed_state_text}, got `{state}`",
+                    item.get("name"),
+                )
             objects.append((path, item))
     return objects
 

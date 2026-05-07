@@ -9,6 +9,14 @@
       `f5os_user_password_change` is a one-way operational action and does not
       support `state: absent`. Remove any deletion fragments for user password changes.
 
+- name: Reject auth LDAP deletion requests
+  ansible.builtin.assert:
+    that:
+      - (system_auth_ldap_delete | default([]) | length) == 0
+    fail_msg: >-
+      `f5os_auth_ldap` has no `state: absent` support.
+      Remove any deletion fragments for LDAP common configuration and manage it in the main tree only.
+
 - name: Remove system TLS cert/key objects
   f5os_tls_cert_key:
     name: "{{ item.name }}"
@@ -16,6 +24,18 @@
   loop: "{{ system_tls_delete | default([]) }}"
   loop_control:
     label: "{{ item.name }}"
+
+- name: Remove imported system TLS cert/key material
+  f5os_import_tls_cert_key:
+    certificate: "{{ item.certificate }}"
+    key: "{{ item.key }}"
+    key_passphrase: "{{ item.key_passphrase | default(omit) }}"
+    state: absent
+    verify_client: "{{ item.verify_client | default(omit) }}"
+    verify_client_depth: "{{ item.verify_client_depth | default(omit) }}"
+  loop: "{{ system_imported_tls_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('imported-tls') }}"
 
 - name: Remove system users
   f5os_user:

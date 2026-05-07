@@ -84,6 +84,27 @@
   loop_control:
     label: "{{ item.name }}"
 
+- name: Apply auth LDAP common configuration
+  f5os_auth_ldap:
+    active_directory: "{{ item.active_directory | default(omit) }}"
+    base_dn: "{{ item.base_dn | default(omit) }}"
+    bind_dn: "{{ item.bind_dn | default(omit) }}"
+    bind_password: "{{ item.bind_password | default(omit) }}"
+    bind_timeout: "{{ item.bind_timeout | default(omit) }}"
+    chase_referrals: "{{ item.chase_referrals | default(omit) }}"
+    idle_timeout: "{{ item.idle_timeout | default(omit) }}"
+    ldap_version: "{{ item.ldap_version | default(omit) }}"
+    read_timeout: "{{ item.read_timeout | default(omit) }}"
+    tls: "{{ item.tls | default(omit) }}"
+    tls_certificate: "{{ item.tls_certificate | default(omit) }}"
+    tls_certificate_validation: "{{ item.tls_certificate_validation | default(omit) }}"
+    tls_ciphers: "{{ item.tls_ciphers | default(omit) }}"
+    tls_key: "{{ item.tls_key | default(omit) }}"
+    unix_attributes: "{{ item.unix_attributes | default(omit) }}"
+  loop: "{{ system_auth_ldap_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('auth-ldap') }}"
+
 - name: Apply system users
   f5os_user:
     username: "{{ item.username }}"
@@ -136,3 +157,15 @@
   loop: "{{ system_snmp_present | default([]) }}"
   loop_control:
     label: "{{ item.name | default('snmp') }}"
+
+- name: Apply imported system TLS cert/key material
+  f5os_import_tls_cert_key:
+    certificate: "{{ item.certificate }}"
+    key: "{{ item.key }}"
+    key_passphrase: "{{ item.key_passphrase | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    verify_client: "{{ item.verify_client | default(omit) }}"
+    verify_client_depth: "{{ item.verify_client_depth | default(omit) }}"
+  loop: "{{ system_imported_tls_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('imported-tls') }}"

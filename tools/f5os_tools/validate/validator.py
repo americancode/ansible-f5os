@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tools.f5os_tools.validate.domains import validate_bootstrap, validate_network, validate_qos, validate_system
+from tools.f5os_tools.validate.domains import (
+    validate_bootstrap,
+    validate_network,
+    validate_qos,
+    validate_software_lifecycle,
+    validate_system,
+    validate_tenants,
+)
 from tools.f5os_tools.validate.models import ValidationResult
 from tools.f5os_tools.validate.tree import REPO_ROOT
 
@@ -21,6 +28,8 @@ class Validator:
         validate_system(self.result)
         validate_network(self.result)
         validate_qos(self.result)
+        validate_tenants(self.result)
+        validate_software_lifecycle(self.result)
         self._print_summary()
         return 0 if self.result.ok else 1
 
@@ -30,6 +39,9 @@ class Validator:
             REPO_ROOT / "playbooks" / "bootstrap.yml",
             REPO_ROOT / "playbooks" / "system.yml",
             REPO_ROOT / "playbooks" / "network.yml",
+            REPO_ROOT / "playbooks" / "qos.yml",
+            REPO_ROOT / "playbooks" / "tenants.yml",
+            REPO_ROOT / "playbooks" / "software_lifecycle.yml",
         ]
         for path in required_paths:
             if not path.exists():

@@ -1,0 +1,17 @@
+---
+# VELOS partition examples for controller-managed chassis partitions.
+# These objects are consumed by `velos_partition` and may be referenced by partition HA and wait trees.
+# Supported fields: `name`, `platform`, `os_version`, `ipv4_mgmt_address`, `ipv4_mgmt_gateway`,
+# `ipv6_mgmt_address`, `ipv6_mgmt_gateway`, `slots`, `configuration_volume`, `images_volume`,
+# `shared_volume`, `wait_time`, and `state`.
+velos_partitions:
+  - name: edge-partition-a
+    platform: velos-controller
+    os_version: 1.8.0-12345
+    ipv4_mgmt_address: 192.0.2.70/24
+    ipv4_mgmt_gateway: 192.0.2.1
+    slots:
+      - 1
+      - 2
+    wait_time: 300
+    state: present

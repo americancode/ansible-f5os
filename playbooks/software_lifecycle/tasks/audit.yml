@@ -1,0 +1,36 @@
+# Software lifecycle audit tasks.
+# Runtime effect: prints planned software lifecycle delete/apply collections before any F5OS module calls.
+---
+- name: Announce software lifecycle audit mode
+  ansible.builtin.debug:
+    msg:
+      - "AUDIT MODE software_lifecycle for {{ inventory_hostname }} -> {{ provider.server }}"
+      - "No F5OS changes will be made."
+
+- name: Print software lifecycle delete collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "DELETE"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "system_images_delete", items: "{{ system_images_delete | default([]) }}" }
+    - { name: "system_installs_delete", items: "{{ system_installs_delete | default([]) }}" }
+    - { name: "tenant_images_delete", items: "{{ tenant_images_delete | default([]) }}" }
+    - { name: "velos_partition_images_delete", items: "{{ velos_partition_images_delete | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Print software lifecycle apply collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "APPLY"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "system_images_present", items: "{{ system_images_present | default([]) }}" }
+    - { name: "system_installs_present", items: "{{ system_installs_present | default([]) }}" }
+    - { name: "tenant_images_present", items: "{{ tenant_images_present | default([]) }}" }
+    - { name: "velos_partition_images_present", items: "{{ velos_partition_images_present | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"

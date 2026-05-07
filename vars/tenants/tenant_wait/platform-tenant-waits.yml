@@ -1,0 +1,10 @@
+---
+# Tenant wait examples for sequencing configured, provisioned, or deployed tenants.
+# These objects reference tenant names from `vars/tenants/tenants/`.
+# Supported fields: `name`, `state`, `delay`, `sleep`, `timeout`, `msg`, and `platform`.
+tenant_waits:
+  - name: appstack-a
+    state: configured
+    sleep: 10
+    timeout: 300
+    platform: rseries

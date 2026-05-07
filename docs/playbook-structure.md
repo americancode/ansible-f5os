@@ -1,7 +1,7 @@
 # Playbook Structure
 
 Canonical playbooks live under `playbooks/`. Root-level `bootstrap.yml`, `system.yml`, and `network.yml` are compatibility wrappers.
-Canonical playbooks currently also include `qos.yml`.
+Canonical playbooks currently also include `qos.yml`, `tenants.yml`, and `software_lifecycle.yml`.
 
 Each canonical domain follows the same pattern:
 

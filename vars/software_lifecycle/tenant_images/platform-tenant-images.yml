@@ -1,0 +1,15 @@
+---
+# Tenant image import examples for rSeries or VELOS partition/appliance targets.
+# Supported fields: `image_name`, `local_path`, `protocol`, `remote_host`, `remote_user`,
+# `remote_password`, `remote_path`, `remote_port`, `timeout`, `platform`, and `state`.
+tenant_images:
+  - image_name: BIGIP-17.5.0-0.0.15.ALL-F5OS.qcow2.zip.bundle
+    remote_host: images.example.net
+    remote_user: image-reader
+    remote_password: CHANGEME-IMAGE-PASSWORD
+    remote_path: /tenant-images/BIGIP/
+    protocol: scp
+    local_path: images/tenant
+    timeout: 1200
+    platform: rseries
+    state: import

@@ -1,0 +1,22 @@
+---
+# LDAP common configuration examples for remote directory integration.
+# These objects are consumed by `f5os_auth_ldap`.
+# Supported fields: `name`, `active_directory`, `base_dn`, `bind_dn`, `bind_password`,
+# `bind_timeout`, `chase_referrals`, `idle_timeout`, `ldap_version`, `read_timeout`,
+# `tls`, `tls_certificate`, `tls_certificate_validation`, `tls_ciphers`, `tls_key`,
+# and `unix_attributes`.
+auth_ldap_configs:
+  - name: corporate-ldap
+    active_directory: true
+    base_dn: dc=example,dc=com
+    bind_dn: cn=svc-ldap,ou=svc,dc=example,dc=com
+    bind_password: CHANGEME-LDAP-BIND-PASSWORD
+    bind_timeout: 10
+    chase_referrals: true
+    idle_timeout: 300
+    ldap_version: 3
+    read_timeout: 30
+    tls: start_tls
+    tls_certificate_validation: demand
+    tls_ciphers: HIGH:!aNULL:!MD5
+    unix_attributes: false

@@ -9,9 +9,11 @@ Current object families:
 - logging
 - allowed IPs
 - authentication and auth servers
+- LDAP common authentication
 - users
 - user password changes
 - TLS cert/key material
+- imported TLS cert/key material
 - SNMP
 
 Current implementation status:
@@ -25,14 +27,18 @@ Current implementation status:
   - `f5os_allowed_ips`
   - `f5os_auth`
   - `f5os_auth_server`
+  - `f5os_auth_ldap`
   - `f5os_user`
   - `f5os_user_password_change`
   - `f5os_tls_cert_key`
+  - `f5os_import_tls_cert_key`
   - `f5os_snmp`
 - `f5os_user_password_change` is treated as apply-only because the module is a non-idempotent operational action, not a reversible desired-state object
+- `f5os_auth_ldap` is treated as main-tree-only because the module has no `state: absent` path
 
 Known module caveats from F5 docs:
 
 - `f5os_logging` is not idempotent due to API restrictions
 - `f5os_auth` is not fully idempotent for some fields such as password policy and encrypted secrets
+- `f5os_auth_ldap` does partial updates and leaves unspecified fields unchanged
 - `f5os_user_password_change` is not idempotent

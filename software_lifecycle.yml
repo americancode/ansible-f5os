@@ -1,0 +1,2 @@
+---
+- import_playbook: playbooks/software_lifecycle.yml

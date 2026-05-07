@@ -1,0 +1,10 @@
+---
+# VELOS partition wait examples for sequencing controller-managed partition lifecycle.
+# These objects reference partition names from `vars/tenants/velos_partitions/`.
+# Supported fields: `name`, `state`, `delay`, `sleep`, `timeout`, `msg`, and `platform`.
+velos_partition_waits:
+  - name: edge-partition-a
+    state: running
+    sleep: 10
+    timeout: 300
+    platform: velos-controller

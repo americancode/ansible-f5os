@@ -86,6 +86,34 @@ def validate_system(result: ValidationResult) -> None:
             if any(provider in remote_providers for provider in item.get("auth_order", [])):
                 result.add_warning(path, "remote auth is configured but no auth server groups exist under vars/system/auth_servers", _name(item))
 
+    auth_ldap_objects = collect_objects(VARS_ROOT / "system" / "auth_ldap", "auth_ldap_configs", result, allowed_states=None)
+    for path, item in auth_ldap_objects:
+        if not any(
+            key in item
+            for key in (
+                "active_directory",
+                "base_dn",
+                "bind_dn",
+                "bind_password",
+                "bind_timeout",
+                "chase_referrals",
+                "idle_timeout",
+                "ldap_version",
+                "read_timeout",
+                "tls",
+                "tls_certificate",
+                "tls_certificate_validation",
+                "tls_ciphers",
+                "tls_key",
+                "unix_attributes",
+            )
+        ):
+            result.add_error(path, "auth_ldap object must define at least one LDAP configuration field", _name(item))
+        if "tls" in item and item["tls"] not in {"start_tls", "off", "on"}:
+            result.add_error(path, "`tls` must be `start_tls`, `off`, or `on`", _name(item))
+        if "tls_certificate_validation" in item and item["tls_certificate_validation"] not in {"never", "allow", "try", "hard", "demand"}:
+            result.add_error(path, "`tls_certificate_validation` must be a valid f5os_auth_ldap choice", _name(item))
+
     user_objects = collect_objects(VARS_ROOT / "system" / "users", "users", result)
     usernames: set[str] = set()
     for path, item in user_objects:
@@ -112,6 +140,19 @@ def validate_system(result: ValidationResult) -> None:
     for path, item in snmp_objects:
         if not any(key in item for key in ("snmp_mib", "snmp_community", "snmp_target", "snmp_user")):
             result.add_error(path, "snmp object must define at least one snmp_* section", _name(item))
+
+    imported_tls_objects = collect_objects(
+        VARS_ROOT / "system" / "imported_tls",
+        "imported_tls_cert_keys",
+        result,
+        allowed_states={"present", "absent"},
+    )
+    for path, item in imported_tls_objects:
+        require_keys(result, path, item, ["certificate", "key"], _name(item))
+        if "verify_client" in item and not isinstance(item["verify_client"], bool):
+            result.add_error(path, "`verify_client` must be a boolean", _name(item))
+        if "verify_client_depth" in item and not isinstance(item["verify_client_depth"], int):
+            result.add_error(path, "`verify_client_depth` must be an integer", _name(item))
 
 
 def validate_network(result: ValidationResult) -> None:
@@ -207,6 +248,173 @@ def validate_qos(result: ValidationResult) -> None:
             require_keys(result, path, meter, ["name", "weight"], _name(item))
             if meter.get("name") not in traffic_priority_names:
                 result.add_error(path, f"meter references unknown traffic priority `{meter.get('name')}`", _name(item))
+
+
+def validate_tenants(result: ValidationResult) -> None:
+    """Validate tenant and VELOS partition var trees and cross-object references."""
+    tenant_objects = collect_objects(
+        VARS_ROOT / "tenants" / "tenants",
+        "tenants",
+        result,
+        allowed_states={"present", "absent"},
+    )
+    tenant_names: set[str] = set()
+    for path, item in tenant_objects:
+        require_keys(result, path, item, ["name", "nodes"], _name(item))
+        if "name" in item:
+            tenant_names.add(item["name"])
+        if "nodes" in item and not isinstance(item["nodes"], list):
+            result.add_error(path, "`nodes` must be a list", _name(item))
+        if "nodes" in item and isinstance(item["nodes"], list):
+            for node in item["nodes"]:
+                if not isinstance(node, int):
+                    result.add_error(path, "`nodes` entries must be integers", _name(item))
+        if "running_state" in item and item["running_state"] not in {"configured", "provisioned", "deployed"}:
+            result.add_error(path, "`running_state` must be `configured`, `provisioned`, or `deployed`", _name(item))
+        if "platform" in item and item["platform"] not in {"rseries", "velos-partition", "velos-controller"}:
+            result.add_error(path, "`platform` must be `rseries`, `velos-partition`, or `velos-controller`", _name(item))
+        if item.get("platform") == "velos-controller":
+            result.add_error(path, "tenant objects cannot target `velos-controller`", _name(item))
+        if "cryptos" in item and item["cryptos"] not in {"enabled", "disabled"}:
+            result.add_error(path, "`cryptos` must be `enabled` or `disabled`", _name(item))
+        if "vlans" in item and not isinstance(item["vlans"], list):
+            result.add_error(path, "`vlans` must be a list", _name(item))
+        if "vlans" in item and isinstance(item["vlans"], list):
+            for vlan in item["vlans"]:
+                if not isinstance(vlan, int):
+                    result.add_error(path, "`vlans` entries must be integers", _name(item))
+
+    tenant_console_objects = collect_objects(
+        VARS_ROOT / "tenants" / "tenant_console",
+        "tenant_console_users",
+        result,
+        allowed_states={"enabled", "locked"},
+    )
+    for path, item in tenant_console_objects:
+        require_keys(result, path, item, ["tenant_username"], _name(item))
+        if item.get("tenant_username") not in tenant_names:
+            result.add_warning(path, "tenant console entry references a tenant not defined under vars/tenants/tenants", _name(item))
+        if "state" in item and item["state"] not in {"enabled", "locked"}:
+            result.add_error(path, "`state` must be `enabled` or `locked`", _name(item))
+
+    tenant_wait_objects = collect_objects(
+        VARS_ROOT / "tenants" / "tenant_wait",
+        "tenant_waits",
+        result,
+        allowed_states={"configured", "provisioned", "deployed", "ssh-ready", "api-ready"},
+    )
+    for path, item in tenant_wait_objects:
+        require_keys(result, path, item, ["name"], _name(item))
+        if item.get("name") not in tenant_names:
+            result.add_warning(path, "tenant wait entry references a tenant not defined under vars/tenants/tenants", _name(item))
+        if "state" in item and item["state"] not in {"configured", "provisioned", "deployed", "ssh-ready", "api-ready"}:
+            result.add_error(path, "`state` must be a valid f5os_tenant_wait state", _name(item))
+
+    partition_objects = collect_objects(
+        VARS_ROOT / "tenants" / "velos_partitions",
+        "velos_partitions",
+        result,
+        allowed_states={"present", "absent", "enabled", "disabled"},
+    )
+    partition_names: set[str] = set()
+    for path, item in partition_objects:
+        require_keys(result, path, item, ["name"], _name(item))
+        if "name" in item:
+            partition_names.add(item["name"])
+        if "slots" in item and not isinstance(item["slots"], list):
+            result.add_error(path, "`slots` must be a list", _name(item))
+        if "slots" in item and isinstance(item["slots"], list):
+            for slot in item["slots"]:
+                if not isinstance(slot, int):
+                    result.add_error(path, "`slots` entries must be integers", _name(item))
+        if "platform" in item and item["platform"] != "velos-controller":
+            result.add_error(path, "VELOS partition objects must target `velos-controller`", _name(item))
+
+    partition_password_objects = collect_objects(
+        VARS_ROOT / "tenants" / "velos_partition_passwords",
+        "velos_partition_password_changes",
+        result,
+        allowed_states=None,
+    )
+    for path, item in partition_password_objects:
+        require_keys(result, path, item, ["user_name", "old_password", "new_password"], _name(item))
+
+    partition_ha_objects = collect_objects(
+        VARS_ROOT / "tenants" / "velos_partition_ha",
+        "velos_partition_ha_configs",
+        result,
+        allowed_states={"present"},
+    )
+    for path, item in partition_ha_objects:
+        require_keys(result, path, item, ["prefer_node"], _name(item))
+        if item.get("name") and item["name"] not in partition_names:
+            result.add_warning(path, "partition HA entry references a partition not defined under vars/tenants/velos_partitions", _name(item))
+        if item.get("prefer_node") not in {"prefer-1", "prefer-2", "active-controller", "auto"}:
+            result.add_error(path, "`prefer_node` must be a valid velos_partition_ha_config choice", _name(item))
+
+    partition_wait_objects = collect_objects(
+        VARS_ROOT / "tenants" / "velos_partition_wait",
+        "velos_partition_waits",
+        result,
+        allowed_states={"running", "ssh-ready"},
+    )
+    for path, item in partition_wait_objects:
+        require_keys(result, path, item, ["name"], _name(item))
+        if item.get("name") not in partition_names:
+            result.add_warning(path, "partition wait entry references a partition not defined under vars/tenants/velos_partitions", _name(item))
+        if "state" in item and item["state"] not in {"running", "ssh-ready"}:
+            result.add_error(path, "`state` must be `running` or `ssh-ready`", _name(item))
+
+
+def validate_software_lifecycle(result: ValidationResult) -> None:
+    """Validate software lifecycle var trees and execution-context boundaries."""
+    system_image_objects = collect_objects(
+        VARS_ROOT / "software_lifecycle" / "system_images",
+        "system_images",
+        result,
+        allowed_states={"import", "present", "absent"},
+    )
+    for path, item in system_image_objects:
+        require_keys(result, path, item, ["remote_image_url"], _name(item))
+        if "local_path" in item and item["local_path"] not in {"images/import", "images/staging", "images/tenant", "images"}:
+            result.add_error(path, "`local_path` must be a valid f5os_system_image_import path", _name(item))
+
+    system_install_objects = collect_objects(
+        VARS_ROOT / "software_lifecycle" / "system_installs",
+        "system_installs",
+        result,
+        allowed_states={"install", "present"},
+    )
+    for path, item in system_install_objects:
+        require_keys(result, path, item, ["image_version"], _name(item))
+
+    tenant_image_objects = collect_objects(
+        VARS_ROOT / "software_lifecycle" / "tenant_images",
+        "tenant_images",
+        result,
+        allowed_states={"import", "present", "absent"},
+    )
+    for path, item in tenant_image_objects:
+        require_keys(result, path, item, ["image_name"], _name(item))
+        if "platform" in item and item["platform"] == "velos-controller":
+            result.add_error(path, "tenant image objects cannot target `velos-controller`", _name(item))
+        if "local_path" in item and item["local_path"] not in {"images/import", "images/staging", "images/tenant", "images"}:
+            result.add_error(path, "`local_path` must be a valid f5os_tenant_image path", _name(item))
+        if "protocol" in item and item["protocol"] not in {"scp", "sftp", "https"}:
+            result.add_error(path, "`protocol` must be `scp`, `sftp`, or `https`", _name(item))
+
+    velos_partition_image_objects = collect_objects(
+        VARS_ROOT / "software_lifecycle" / "velos_partition_images",
+        "velos_partition_images",
+        result,
+        allowed_states={"import", "present", "absent"},
+    )
+    for path, item in velos_partition_image_objects:
+        require_keys(result, path, item, ["image_name"], _name(item))
+        if "platform" in item and item["platform"] != "velos-controller":
+            result.add_error(path, "VELOS partition image objects must target `velos-controller`", _name(item))
+        if "protocol" in item and item["protocol"] not in {"scp", "sftp", "https"}:
+            result.add_error(path, "`protocol` must be `scp`, `sftp`, or `https`", _name(item))
 
 
 def validate_deletion_trees(result: ValidationResult) -> None:

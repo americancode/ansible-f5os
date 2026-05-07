@@ -1,0 +1,23 @@
+---
+# Tenant examples for rSeries or VELOS partition tenant lifecycle.
+# These objects are consumed by `f5os_tenant` and may be referenced by tenant-console and tenant-wait trees.
+# Supported fields: `name`, `platform`, `image_name`, `nodes`, `mgmt_ip`, `mgmt_prefix`,
+# `mgmt_gateway`, `vlans`, `cpu_cores`, `memory`, `cryptos`, `virtual_disk_size`,
+# `running_state`, `deployment_file`, `dag_ipv6_prefix_length`, `mac_block_size`, `type`, and `state`.
+tenants:
+  - name: appstack-a
+    platform: rseries
+    image_name: BIGIP-17.5.0-0.0.15.ALL-F5OS.qcow2.zip.bundle
+    nodes:
+      - 1
+    mgmt_ip: 192.0.2.60
+    mgmt_prefix: 24
+    mgmt_gateway: 192.0.2.1
+    vlans:
+      - 110
+    cpu_cores: 2
+    memory: 8192
+    cryptos: enabled
+    virtual_disk_size: 85
+    running_state: configured
+    state: present

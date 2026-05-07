@@ -1,0 +1,9 @@
+# Tenants prep orchestrator.
+# Produces canonical runtime sets for tenant lifecycle, tenant-console access, tenant waits,
+# VELOS partitions, partition HA, partition waits, and partition password changes.
+---
+- name: Load tenant var fragments
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/tenants/prep/load-vars.yml"
+
+- name: Build tenant runtime facts
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/tenants/prep/build-runtime.yml"

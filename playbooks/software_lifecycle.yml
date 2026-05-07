@@ -1,0 +1,23 @@
+# Software lifecycle entrypoint.
+# Loads `vars/common.yml` and runs software lifecycle prep before managing system and image workflows.
+---
+- name: Manage F5OS software and image lifecycle
+  hosts: all
+  connection: httpapi
+  gather_facts: false
+  collections:
+    - f5networks.f5os
+
+  vars:
+    repo_root: "{{ playbook_dir }}/.."
+
+  vars_files:
+    - "{{ repo_root }}/vars/common.yml"
+
+  pre_tasks:
+    - name: Prepare software lifecycle inputs
+      ansible.builtin.import_tasks: software_lifecycle/prep.yml
+
+  tasks:
+    - name: Manage software lifecycle objects
+      ansible.builtin.import_tasks: software_lifecycle/tasks/manage.yml
