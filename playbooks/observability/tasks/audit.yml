@@ -1,0 +1,36 @@
+# Observability audit tasks.
+# Runtime effect: prints planned observability delete/apply collections before any F5OS module calls.
+---
+- name: Announce observability audit mode
+  ansible.builtin.debug:
+    msg:
+      - "AUDIT MODE observability for {{ inventory_hostname }} -> {{ provider.server }}"
+      - "No F5OS changes will be made."
+
+- name: Print observability delete collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "DELETE"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "device_info_delete", items: "{{ device_info_delete | default([]) }}" }
+    - { name: "facts_delete", items: "{{ facts_delete | default([]) }}" }
+    - { name: "qkview_delete", items: "{{ qkview_delete | default([]) }}" }
+    - { name: "config_backup_delete", items: "{{ config_backup_delete | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Print observability apply collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "APPLY"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "device_info_present", items: "{{ device_info_present | default([]) }}" }
+    - { name: "facts_present", items: "{{ facts_present | default([]) }}" }
+    - { name: "qkview_present", items: "{{ qkview_present | default([]) }}" }
+    - { name: "config_backup_present", items: "{{ config_backup_present | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"

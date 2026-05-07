@@ -1,0 +1,8 @@
+# Observability prep orchestrator.
+# Produces canonical runtime sets for device info collection, facts, qkview generation, and config backup workflows.
+---
+- name: Load observability var fragments
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/observability/prep/load-vars.yml"
+
+- name: Build observability runtime facts
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/observability/prep/build-runtime.yml"

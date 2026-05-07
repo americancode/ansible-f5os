@@ -1,0 +1,50 @@
+# Observability variable loader.
+# Builds aggregated raw collections from the observability var tree and deletion tree.
+---
+- name: Load device info fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "device info"
+    source_root: "{{ repo_root }}/vars/observability/device_info"
+    deletion_root: "{{ repo_root }}/vars/observability/deletions/device_info"
+    fragment_var_name: "device_info_fragment"
+    aggregate_var: "device_info_aggregate"
+    deletion_aggregate_var: "device_info_delete_aggregate"
+    collection_key: "device_info_requests"
+    defaults_key: "device_info_defaults"
+
+- name: Load facts fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "facts"
+    source_root: "{{ repo_root }}/vars/observability/facts"
+    deletion_root: "{{ repo_root }}/vars/observability/deletions/facts"
+    fragment_var_name: "facts_fragment"
+    aggregate_var: "facts_aggregate"
+    deletion_aggregate_var: "facts_delete_aggregate"
+    collection_key: "facts_requests"
+    defaults_key: "facts_defaults"
+
+- name: Load qkview fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "qkview"
+    source_root: "{{ repo_root }}/vars/observability/qkview"
+    deletion_root: "{{ repo_root }}/vars/observability/deletions/qkview"
+    fragment_var_name: "qkview_fragment"
+    aggregate_var: "qkview_aggregate"
+    deletion_aggregate_var: "qkview_delete_aggregate"
+    collection_key: "qkview_requests"
+    defaults_key: "qkview_defaults"
+
+- name: Load config backup fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "config backups"
+    source_root: "{{ repo_root }}/vars/observability/config_backups"
+    deletion_root: "{{ repo_root }}/vars/observability/deletions/config_backups"
+    fragment_var_name: "config_backup_fragment"
+    aggregate_var: "config_backup_aggregate"
+    deletion_aggregate_var: "config_backup_delete_aggregate"
+    collection_key: "config_backups"
+    defaults_key: "config_backup_defaults"

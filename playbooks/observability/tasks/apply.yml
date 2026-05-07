@@ -1,0 +1,60 @@
+# Observability apply tasks.
+# Runtime effect: collects info/facts and manages qkview and config backup artifacts on the device.
+---
+- name: Collect device info
+  f5os_device_info:
+    gather_subset: "{{ item.gather_subset }}"
+  loop: "{{ device_info_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default(item.gather_subset | join(',')) }}"
+  register: device_info_results
+
+- name: Print device info collection summary
+  ansible.builtin.debug:
+    msg: "Collected device info for {{ item.item.name | default(inventory_hostname) }}"
+  loop: "{{ device_info_results.results | default([]) }}"
+  loop_control:
+    label: "{{ item.item.name | default(inventory_hostname) }}"
+
+- name: Collect facts
+  f5networks.f5os.f5os_facts:
+    gather_subset: "{{ item.gather_subset | default(omit) }}"
+  loop: "{{ facts_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('facts') }}"
+  register: facts_results
+
+- name: Print facts collection summary
+  ansible.builtin.debug:
+    msg: "Collected fact subsets {{ item.ansible_facts.ansible_net_gather_subset | default([]) | join(',') }}"
+  loop: "{{ facts_results.results | default([]) }}"
+  loop_control:
+    label: "{{ item.item.name | default('facts') }}"
+
+- name: Manage qkview files
+  f5os_qkview:
+    filename: "{{ item.filename }}"
+    exclude_cores: "{{ item.exclude_cores | default(omit) }}"
+    max_core_size: "{{ item.max_core_size | default(omit) }}"
+    max_file_size: "{{ item.max_file_size | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+  loop: "{{ qkview_present | default([]) }}"
+  loop_control:
+    label: "{{ item.filename }}"
+
+- name: Manage config backup artifacts
+  f5os_config_backup:
+    name: "{{ item.name }}"
+    force: "{{ item.force | default(omit) }}"
+    protocol: "{{ item.protocol | default(omit) }}"
+    remote_host: "{{ item.remote_host | default(omit) }}"
+    remote_password: "{{ item.remote_password | default(omit) }}"
+    remote_path: "{{ item.remote_path | default(omit) }}"
+    remote_port: "{{ item.remote_port | default(omit) }}"
+    remote_user: "{{ item.remote_user | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+  loop: "{{ config_backup_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"

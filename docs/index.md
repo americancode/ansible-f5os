@@ -11,3 +11,4 @@ Start here for the repo structure and implementation status.
 - [qos.md](qos.md)
 - [tenants.md](tenants.md)
 - [software_lifecycle.md](software_lifecycle.md)
+- [observability.md](observability.md)

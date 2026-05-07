@@ -10,6 +10,7 @@ Current domain roots:
 - `vars/qos/`
 - `vars/tenants/`
 - `vars/software_lifecycle/`
+- `vars/observability/`
 
 Each domain has:
 

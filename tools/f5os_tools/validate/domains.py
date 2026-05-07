@@ -417,6 +417,92 @@ def validate_software_lifecycle(result: ValidationResult) -> None:
             result.add_error(path, "`protocol` must be `scp`, `sftp`, or `https`", _name(item))
 
 
+def validate_observability(result: ValidationResult) -> None:
+    """Validate observability var trees."""
+    device_info_objects = collect_objects(
+        VARS_ROOT / "observability" / "device_info",
+        "device_info_requests",
+        result,
+        allowed_states={"present"},
+    )
+    valid_device_subsets = {
+        "all",
+        "interfaces",
+        "lag-interfaces",
+        "vlans",
+        "controller-images",
+        "partition-images",
+        "partitions-info",
+        "tenant-images",
+        "tenants-info",
+        "snmp-info",
+        "qos-info",
+        "system-info",
+        "server-groups",
+        "users",
+        "fdb",
+        "tls",
+        "restconf-token",
+        "allowed-ips",
+        "!all",
+        "!interfaces",
+        "!lag-interfaces",
+        "!vlans",
+        "!controller-images",
+        "!partition-images",
+        "!partitions-info",
+        "!tenant-images",
+        "!tenants-info",
+        "!snmp-info",
+        "!qos-info",
+        "!system-info",
+        "!server-groups",
+        "!users",
+        "!fdb",
+        "!tls",
+        "!restconf-token",
+        "!allowed-ips",
+    }
+    for path, item in device_info_objects:
+        require_keys(result, path, item, ["gather_subset"], _name(item))
+        if not isinstance(item.get("gather_subset"), list):
+            result.add_error(path, "`gather_subset` must be a list", _name(item))
+            continue
+        for subset in item["gather_subset"]:
+            if subset not in valid_device_subsets:
+                result.add_error(path, f"unsupported device info gather subset `{subset}`", _name(item))
+
+    facts_objects = collect_objects(
+        VARS_ROOT / "observability" / "facts",
+        "facts_requests",
+        result,
+        allowed_states=None,
+    )
+    for path, item in facts_objects:
+        if "gather_subset" in item and not isinstance(item["gather_subset"], list):
+            result.add_error(path, "`gather_subset` must be a list when provided", _name(item))
+
+    qkview_objects = collect_objects(
+        VARS_ROOT / "observability" / "qkview",
+        "qkview_requests",
+        result,
+        allowed_states={"present", "absent"},
+    )
+    for path, item in qkview_objects:
+        require_keys(result, path, item, ["filename"], _name(item))
+
+    config_backup_objects = collect_objects(
+        VARS_ROOT / "observability" / "config_backups",
+        "config_backups",
+        result,
+        allowed_states={"present", "absent"},
+    )
+    for path, item in config_backup_objects:
+        require_keys(result, path, item, ["name"], _name(item))
+        if "protocol" in item and item["protocol"] not in {"https", "scp", "sftp"}:
+            result.add_error(path, "`protocol` must be `https`, `scp`, or `sftp`", _name(item))
+
+
 def validate_deletion_trees(result: ValidationResult) -> None:
     """Validate that deletion trees contain parseable YAML only."""
     deletions_root = VARS_ROOT

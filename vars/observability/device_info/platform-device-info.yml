@@ -1,0 +1,11 @@
+---
+# Device info collection examples for targeted F5OS runtime inspection.
+# Supported fields: `name`, `gather_subset`, and `state`.
+device_info_requests:
+  - name: platform-runtime
+    gather_subset:
+      - system-info
+      - interfaces
+      - vlans
+      - tenants-info
+    state: present

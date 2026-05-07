@@ -1,0 +1,38 @@
+# Observability runtime builder.
+# Shapes aggregated fragments into final present/delete collections consumed by audit and runtime tasks.
+---
+- name: Classify device info operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "device info"
+    source_items: "{{ device_info_aggregate | default([]) }}"
+    source_delete_items: "{{ device_info_delete_aggregate | default([]) }}"
+    present_var: "device_info_present"
+    delete_var: "device_info_delete"
+
+- name: Classify facts operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "facts"
+    source_items: "{{ facts_aggregate | default([]) }}"
+    source_delete_items: "{{ facts_delete_aggregate | default([]) }}"
+    present_var: "facts_present"
+    delete_var: "facts_delete"
+
+- name: Classify qkview operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "qkview"
+    source_items: "{{ qkview_aggregate | default([]) }}"
+    source_delete_items: "{{ qkview_delete_aggregate | default([]) }}"
+    present_var: "qkview_present"
+    delete_var: "qkview_delete"
+
+- name: Classify config backup operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "config backups"
+    source_items: "{{ config_backup_aggregate | default([]) }}"
+    source_delete_items: "{{ config_backup_delete_aggregate | default([]) }}"
+    present_var: "config_backup_present"
+    delete_var: "config_backup_delete"

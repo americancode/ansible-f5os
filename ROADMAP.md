@@ -2,22 +2,7 @@
 
 ## To Do
 
-1. Build the `observability` domain for diagnostics, exports, and non-config runtime collection tasks.
-   - Completion target: `runtime+validation`
-   - Module coverage:
-     - `f5os_device_info`
-     - `f5os_facts`
-     - `f5os_qkview`
-     - `f5os_config_backup`
-   - Treat this domain as operational tooling first, not config convergence.
-   - Decide how much of it belongs in canonical playbooks versus `tools/` wrappers for export, collection, and artifact naming.
-   - Var tree targets:
-     - `vars/observability/device_info/`
-     - `vars/observability/facts/`
-     - `vars/observability/qkview/`
-     - `vars/observability/config_backups/`
-
-2. Add cross-platform modeling rules before implementation spreads.
+1. Add cross-platform modeling rules before implementation spreads.
    - Keep rSeries and VELOS differences visible in vars and docs rather than relying on hidden branching in tasks.
    - Decide whether platform splits belong in:
      - separate trees like `vars/rseries/...` and `vars/velos/...`
@@ -25,18 +10,18 @@
      - shared canonical trees with explicit `platform` selectors
    - Document one repo-wide answer before multiple domains are implemented.
 
-3. Extend validation depth as new domains land.
+2. Extend validation depth as new domains land.
    - `validate-vars` already understands recursive var discovery and layered `settings.yml`.
    - Keep nested field models and cross-object references aligned with each implemented module surface.
    - Do not mark a domain complete if runtime schemas and validation schemas diverge.
 
-4. Add the remaining supporting documentation adapted from the BIG-IP repo where the workflow still applies.
+3. Add the remaining supporting documentation adapted from the BIG-IP repo where the workflow still applies.
    - AWX operating model and bootstrap handoff docs
    - example inventory and execution docs for rSeries versus VELOS targets
    - tenant lifecycle docs covering image upload, tenant creation, wait sequencing, tenant-console access, and safe delete/update patterns
    - domain usage examples as each remaining domain is implemented
 
-5. Add repository tooling and developer ergonomics to match the reference repo's standard.
+4. Add repository tooling and developer ergonomics to match the reference repo's standard.
    - Python packaging and lint/test targets for helper tools
    - `audit_mode` support across canonical playbooks
    - keep local validation and CI behavior aligned as the repo grows

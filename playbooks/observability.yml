@@ -1,0 +1,23 @@
+# Observability entrypoint.
+# Loads `vars/common.yml` and runs observability prep before collection/export tasks.
+---
+- name: Run F5OS observability workflows
+  hosts: all
+  connection: httpapi
+  gather_facts: false
+  collections:
+    - f5networks.f5os
+
+  vars:
+    repo_root: "{{ playbook_dir }}/.."
+
+  vars_files:
+    - "{{ repo_root }}/vars/common.yml"
+
+  pre_tasks:
+    - name: Prepare observability inputs
+      ansible.builtin.import_tasks: observability/prep.yml
+
+  tasks:
+    - name: Manage observability objects
+      ansible.builtin.import_tasks: observability/tasks/manage.yml

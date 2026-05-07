@@ -1,0 +1,14 @@
+# Observability manage tasks.
+# Runtime effect: dispatch either audit preview or runtime delete/apply for collection/export object families.
+---
+- name: Audit planned observability objects
+  ansible.builtin.import_tasks: audit.yml
+  when: audit_mode | default(false)
+
+- name: Remove managed observability objects
+  ansible.builtin.import_tasks: delete.yml
+  when: not (audit_mode | default(false))
+
+- name: Apply desired observability objects
+  ansible.builtin.import_tasks: apply.yml
+  when: not (audit_mode | default(false))

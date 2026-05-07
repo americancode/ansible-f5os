@@ -1,0 +1,10 @@
+---
+# QKView generation examples for support artifact creation.
+# Supported fields: `filename`, `exclude_cores`, `max_core_size`, `max_file_size`, `timeout`, and `state`.
+qkview_requests:
+  - filename: support-case-12345
+    exclude_cores: true
+    max_core_size: 25
+    max_file_size: 500
+    timeout: 60
+    state: present

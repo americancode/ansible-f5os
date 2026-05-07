@@ -18,9 +18,10 @@ Implemented domains:
 - `qos`
 - `tenants`
 - `software_lifecycle`
+- `observability`
 
 Current next domain:
 
-- `observability`
+- cross-platform modeling and documentation hardening
 
 Start with [ROADMAP.md](ROADMAP.md).

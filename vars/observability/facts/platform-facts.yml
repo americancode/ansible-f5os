@@ -1,0 +1,7 @@
+---
+# Facts collection examples for baseline platform/version discovery.
+# Supported fields: `name` and `gather_subset`.
+facts_requests:
+  - name: default-facts
+    gather_subset:
+      - default

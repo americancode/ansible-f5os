@@ -1,0 +1,32 @@
+# Observability delete tasks.
+# Runtime effect: removes generated qkview and config backup files while rejecting delete requests for read-only collection modules.
+---
+- name: Reject device info deletion requests
+  ansible.builtin.assert:
+    that:
+      - (device_info_delete | default([]) | length) == 0
+    fail_msg: >-
+      `f5os_device_info` is a read-only collection module and does not support deletions.
+
+- name: Reject facts deletion requests
+  ansible.builtin.assert:
+    that:
+      - (facts_delete | default([]) | length) == 0
+    fail_msg: >-
+      `f5os_facts` is a read-only collection module and does not support deletions.
+
+- name: Remove qkview files
+  f5os_qkview:
+    filename: "{{ item.filename }}"
+    state: absent
+  loop: "{{ qkview_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.filename }}"
+
+- name: Remove config backup files
+  f5os_config_backup:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ config_backup_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"

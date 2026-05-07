@@ -1,0 +1,12 @@
+---
+# Config backup export examples for platform recovery workflows.
+# Supported fields: `name`, `force`, `protocol`, `remote_host`, `remote_user`,
+# `remote_password`, `remote_path`, `remote_port`, `timeout`, and `state`.
+config_backups:
+  - name: nightly-platform-backup
+    force: true
+    protocol: https
+    remote_host: backups.example.net
+    remote_path: /uploads/f5os/nightly-platform-backup.ucs
+    timeout: 600
+    state: present

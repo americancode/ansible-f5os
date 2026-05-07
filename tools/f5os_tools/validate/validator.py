@@ -7,6 +7,7 @@ from pathlib import Path
 from tools.f5os_tools.validate.domains import (
     validate_bootstrap,
     validate_network,
+    validate_observability,
     validate_qos,
     validate_software_lifecycle,
     validate_system,
@@ -30,6 +31,7 @@ class Validator:
         validate_qos(self.result)
         validate_tenants(self.result)
         validate_software_lifecycle(self.result)
+        validate_observability(self.result)
         self._print_summary()
         return 0 if self.result.ok else 1
 
@@ -42,6 +44,7 @@ class Validator:
             REPO_ROOT / "playbooks" / "qos.yml",
             REPO_ROOT / "playbooks" / "tenants.yml",
             REPO_ROOT / "playbooks" / "software_lifecycle.yml",
+            REPO_ROOT / "playbooks" / "observability.yml",
         ]
         for path in required_paths:
             if not path.exists():

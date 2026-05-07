@@ -21,6 +21,7 @@ Current `make validate` behavior:
   - `qos`
   - `tenants`
   - `software_lifecycle`
+  - `observability`
 - runs `ansible-playbook --syntax-check` for:
   - `playbooks/bootstrap.yml`
   - `playbooks/system.yml`
@@ -28,6 +29,7 @@ Current `make validate` behavior:
   - `playbooks/qos.yml`
   - `playbooks/tenants.yml`
   - `playbooks/software_lifecycle.yml`
+  - `playbooks/observability.yml`
 
 Current GitLab CI behavior:
 
