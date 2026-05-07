@@ -18,6 +18,11 @@ Current implementation status:
   - `velos_controller_management_interfaces`
 - delete input is rejected intentionally because these bootstrap modules do not support a normal absent lifecycle
 
+Platform mapping:
+
+- `rseries_management_interfaces` uses `platform: rseries`
+- `velos_controller_management_interfaces` uses `platform: velos-controller`
+
 Connection model:
 
 - F5OS playbooks use `connection: httpapi`

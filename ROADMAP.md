@@ -4,11 +4,13 @@
 
 1. Add cross-platform modeling rules before implementation spreads.
    - Keep rSeries and VELOS differences visible in vars and docs rather than relying on hidden branching in tasks.
-   - Decide whether platform splits belong in:
-     - separate trees like `vars/rseries/...` and `vars/velos/...`
-     - per-domain platform categories like `vars/tenants/velos_partitions/...`
-     - shared canonical trees with explicit `platform` selectors
-   - Document one repo-wide answer before multiple domains are implemented.
+   - Repo-standard platform selectors are now documented as:
+     - `rseries`
+     - `velos-controller`
+     - `velos-partition`
+   - Remaining work:
+     - decide where host-scoped targeting is sufficient versus where object-scoped `platform` selectors remain justified
+     - decide whether any future domains should split into separate host-context playbooks instead of mixed controller/partition trees
 
 2. Extend validation depth as new domains land.
    - `validate-vars` already understands recursive var discovery and layered `settings.yml`.

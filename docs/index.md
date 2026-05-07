@@ -3,6 +3,7 @@
 Start here for the repo structure and implementation status.
 
 - [playbook-structure.md](playbook-structure.md)
+- [platform-model.md](platform-model.md)
 - [var-layout.md](var-layout.md)
 - [validation.md](validation.md)
 - [bootstrap.md](bootstrap.md)

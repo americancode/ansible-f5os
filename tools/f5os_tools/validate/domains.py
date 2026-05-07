@@ -30,8 +30,8 @@ def validate_bootstrap(result: ValidationResult) -> None:
     for path, item in mgmt_objects:
         require_keys(result, path, item, ["dhcp"], _name(item))
         platform = item.get("platform")
-        if platform and platform not in {"rseries", "velos"}:
-            result.add_error(path, "`platform` must be `rseries` or `velos`", _name(item))
+        if platform and platform not in {"rseries", "velos-controller"}:
+            result.add_error(path, "`platform` must be `rseries` or `velos-controller`", _name(item))
         if item.get("dhcp") is False and not any(item.get(key) for key in ("ipv4", "ipv6")):
             result.add_error(path, "static management config requires `ipv4` or `ipv6`", _name(item))
 

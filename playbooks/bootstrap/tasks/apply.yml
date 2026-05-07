@@ -53,4 +53,4 @@
   loop: "{{ bootstrap_management_interfaces_present | default([]) }}"
   loop_control:
     label: "{{ item.name | default('velos-controller-management') }}"
-  when: (item.platform | default(platform_type)) == 'velos'
+  when: (item.platform | default(platform_type)) == 'velos-controller'

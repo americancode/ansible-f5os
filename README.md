@@ -24,4 +24,10 @@ Current next domain:
 
 - cross-platform modeling and documentation hardening
 
+Platform targeting uses the repo-standard selectors documented in [docs/platform-model.md](docs/platform-model.md):
+
+- `rseries`
+- `velos-controller`
+- `velos-partition`
+
 Start with [ROADMAP.md](ROADMAP.md).
