@@ -20,6 +20,15 @@ Repo-wide rule:
 - use per-object `platform` only when one host intentionally carries mixed object families
 - do not introduce alternate labels like `velos` or hidden implicit platform branching in new domains
 
+Repo-wide decision:
+
+- host-scoped targeting is the default operating model for this repo
+- object-scoped `platform` is an explicit exception, not the baseline
+- new domains should start host-scoped unless they truly need mixed controller-side and partition-side objects in one canonical playbook
+- the current justified exceptions are:
+  - `tenants`
+  - `software_lifecycle`
+
 Current domain mapping:
 
 - `bootstrap`
@@ -49,3 +58,15 @@ Authoring guidance:
   - `platform_type` describes that host
 - use object-scoped `platform` only when a single canonical playbook intentionally carries both controller-side and tenant-side objects
 - when an object family requires different schemas or ordering between `rseries` and VELOS contexts, split the var trees by object family rather than hiding the difference in task logic
+- do not add `platform` to objects in shared host-context domains like `network`, `qos`, or `observability` unless a real platform-specific module constraint forces it
+
+Inventory guidance:
+
+- keep separate inventory hosts for:
+  - each rSeries platform
+  - each VELOS controller
+  - each VELOS partition execution context
+- use inventory grouping and host vars to choose which canonical playbooks run against which targets
+- use object-level `platform` only when one host intentionally carries both controller-only and partition-only objects in the same domain
+
+See [inventory-model.md](inventory-model.md) for concrete examples.

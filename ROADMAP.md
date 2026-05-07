@@ -2,28 +2,17 @@
 
 ## To Do
 
-1. Add cross-platform modeling rules before implementation spreads.
-   - Keep rSeries and VELOS differences visible in vars and docs rather than relying on hidden branching in tasks.
-   - Repo-standard platform selectors are now documented as:
-     - `rseries`
-     - `velos-controller`
-     - `velos-partition`
-   - Remaining work:
-     - decide where host-scoped targeting is sufficient versus where object-scoped `platform` selectors remain justified
-     - decide whether any future domains should split into separate host-context playbooks instead of mixed controller/partition trees
-
-2. Extend validation depth as new domains land.
+1. Extend validation depth as new domains land.
    - `validate-vars` already understands recursive var discovery and layered `settings.yml`.
    - Keep nested field models and cross-object references aligned with each implemented module surface.
    - Do not mark a domain complete if runtime schemas and validation schemas diverge.
 
-3. Add the remaining supporting documentation adapted from the BIG-IP repo where the workflow still applies.
+2. Add the remaining supporting documentation adapted from the BIG-IP repo where the workflow still applies.
    - AWX operating model and bootstrap handoff docs
-   - example inventory and execution docs for rSeries versus VELOS targets
    - tenant lifecycle docs covering image upload, tenant creation, wait sequencing, tenant-console access, and safe delete/update patterns
    - domain usage examples as each remaining domain is implemented
 
-4. Add repository tooling and developer ergonomics to match the reference repo's standard.
+3. Add repository tooling and developer ergonomics to match the reference repo's standard.
    - Python packaging and lint/test targets for helper tools
    - `audit_mode` support across canonical playbooks
    - keep local validation and CI behavior aligned as the repo grows

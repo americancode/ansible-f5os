@@ -30,4 +30,6 @@ Platform targeting uses the repo-standard selectors documented in [docs/platform
 - `velos-controller`
 - `velos-partition`
 
+Example host inventory is in [examples/inventory/hosts.yml](examples/inventory/hosts.yml).
+
 Start with [ROADMAP.md](ROADMAP.md).
