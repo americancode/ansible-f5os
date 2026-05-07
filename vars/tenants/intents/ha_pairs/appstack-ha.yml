@@ -1,0 +1,50 @@
+---
+# Tenant HA pair intent example.
+# These objects compile into tenant image, tenant, tenant wait, and tenant-console canonical runtime objects.
+# Supported fields: `name`, `platform`, `image`, `tenant_defaults`, `tenants`, `wait`,
+# `tenant_console`, and `bigip_handoff`.
+tenant_ha_pairs:
+  - name: appstack-ha
+    platform: rseries
+    image:
+      image_name: BIGIP-17.5.0-0.0.15.ALL-F5OS-HA.qcow2.zip.bundle
+      remote_host: images.example.net
+      remote_user: image-reader
+      remote_password: CHANGEME-IMAGE-PASSWORD
+      remote_path: /tenant-images/BIGIP/
+      protocol: scp
+      local_path: images/tenant
+      timeout: 1200
+      state: import
+    tenant_defaults:
+      nodes:
+        - 1
+      mgmt_prefix: 24
+      mgmt_gateway: 192.0.2.1
+      vlans:
+        - 110
+      cpu_cores: 2
+      memory: 8192
+      cryptos: enabled
+      virtual_disk_size: 85
+      running_state: configured
+      state: present
+    tenants:
+      - name: appstack-ha-a
+        mgmt_ip: 192.0.2.60
+        ha_role: active
+      - name: appstack-ha-b
+        mgmt_ip: 192.0.2.61
+        ha_role: standby
+    wait:
+      state: configured
+      sleep: 10
+      timeout: 300
+    tenant_console:
+      console_user_password: CHANGEME-TENANT-CONSOLE
+      role: tenant-console
+      state: enabled
+    bigip_handoff:
+      inventory_group: bigip_appstack_ha
+      cluster_name: appstack-ha
+      automation_repo: ansible-bigip

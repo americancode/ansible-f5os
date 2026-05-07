@@ -2,6 +2,8 @@
 
 This repo manages BIG-IP tenant lifecycle on F5OS through `software_lifecycle` and `tenants`.
 
+For HA pairs, prefer `tenant_ha_intents` once the pair should be managed as one logical unit. The intent layer compiles into the same canonical runtime objects used by the lower-level playbooks.
+
 Normal lifecycle order:
 
 1. upload tenant image
@@ -35,6 +37,7 @@ VELOS controller side:
 
 Safe authoring guidance:
 
+- use `vars/tenants/intents/ha_pairs/` for BIG-IP HA pairs that should stay aligned
 - upload images before declaring a tenant that depends on them
 - keep tenant create/update objects in `vars/tenants/tenants/`
 - keep wait objects in `vars/tenants/tenant_wait/`
@@ -68,3 +71,11 @@ Operational cautions:
 - password change modules are not idempotent
 - controller-side and tenant-side objects should be separated by inventory target whenever possible
 - this repo manages tenant lifecycle on F5OS, not BIG-IP application configuration inside the tenant
+
+HA intent compiler output:
+
+- `tenant_images`
+- `tenants`
+- `tenant_waits`
+- `tenant_console_users`
+- BIG-IP handoff metadata for the downstream automation repo

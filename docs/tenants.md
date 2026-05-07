@@ -7,6 +7,7 @@ The tenants domain manages two explicit execution contexts:
 
 Current object families:
 
+- tenant HA pair intents
 - tenants
 - tenant console access
 - tenant waits

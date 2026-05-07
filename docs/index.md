@@ -8,6 +8,7 @@ Start here for the repo structure and implementation status.
 - [awx-operating-model.md](awx-operating-model.md)
 - [bootstrap-handoff.md](bootstrap-handoff.md)
 - [tenant-lifecycle.md](tenant-lifecycle.md)
+- [f5os-to-bigip-ha-onboarding.md](f5os-to-bigip-ha-onboarding.md)
 - [var-layout.md](var-layout.md)
 - [validation.md](validation.md)
 - [bootstrap.md](bootstrap.md)

@@ -10,6 +10,7 @@ from pathlib import Path
 from filter_plugins.f5os_filters.common import deep_merge_dicts
 from filter_plugins.f5os_filters.fragments import aggregate_settings_fragments, classify_fragment_operations
 from filter_plugins.f5os_filters.settings import load_settings_hierarchy
+from filter_plugins.f5os_filters.tenant_ha import compile_tenant_ha_intents
 
 
 class DeepMergeTests(unittest.TestCase):
@@ -100,6 +101,46 @@ class FragmentAggregationTests(unittest.TestCase):
             [item["name"] for item in classify_fragment_operations(items, "delete")],
             ["four"],
         )
+
+
+class TenantHaIntentTests(unittest.TestCase):
+    """Validate HA intent compilation into canonical object collections."""
+
+    def test_compile_tenant_ha_intents_outputs_canonical_collections(self) -> None:
+        compiled = compile_tenant_ha_intents(
+            [
+                {
+                    "name": "app",
+                    "platform": "rseries",
+                    "image": {
+                        "image_name": "BIGIP.qcow2.zip.bundle",
+                        "remote_host": "images.example.net",
+                    },
+                    "tenant_defaults": {
+                        "nodes": [1],
+                        "vlans": [110],
+                        "cpu_cores": 2,
+                    },
+                    "tenants": [
+                        {"name": "app-a", "mgmt_ip": "192.0.2.10"},
+                        {"name": "app-b", "mgmt_ip": "192.0.2.11"},
+                    ],
+                    "wait": {"state": "configured", "timeout": 300},
+                    "tenant_console": {"state": "enabled"},
+                    "bigip_handoff": {"inventory_group": "app", "cluster_name": "app"},
+                }
+            ]
+        )
+
+        self.assertEqual(compiled["tenant_images"][0]["image_name"], "BIGIP.qcow2.zip.bundle")
+        self.assertEqual([item["name"] for item in compiled["tenants"]], ["app-a", "app-b"])
+        self.assertEqual(compiled["tenants"][0]["image_name"], "BIGIP.qcow2.zip.bundle")
+        self.assertEqual([item["name"] for item in compiled["tenant_waits"]], ["app-a", "app-b"])
+        self.assertEqual(
+            [item["tenant_username"] for item in compiled["tenant_console_users"]],
+            ["app-a", "app-b"],
+        )
+        self.assertEqual(compiled["bigip_handoffs"][0]["inventory_group"], "app")
 
 
 if __name__ == "__main__":

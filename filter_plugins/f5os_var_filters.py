@@ -6,6 +6,7 @@ from filter_plugins.f5os_filters.fragments import (
     discover_yaml_fragments,
 )
 from filter_plugins.f5os_filters.settings import load_settings_hierarchy
+from filter_plugins.f5os_filters.tenant_ha import compile_tenant_ha_intents
 
 
 class FilterModule:
@@ -17,4 +18,5 @@ class FilterModule:
             "aggregate_settings_fragments": aggregate_settings_fragments,
             "classify_fragment_operations": classify_fragment_operations,
             "load_settings_hierarchy": load_settings_hierarchy,
+            "compile_tenant_ha_intents": compile_tenant_ha_intents,
         }

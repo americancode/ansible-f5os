@@ -1,0 +1,23 @@
+---
+tenant_ha_pair_defaults:
+  platform: rseries
+  tenant_defaults:
+    nodes:
+      - 1
+    mgmt_prefix: 24
+    mgmt_gateway: 192.0.2.1
+    vlans:
+      - 110
+    cpu_cores: 2
+    memory: 8192
+    cryptos: enabled
+    virtual_disk_size: 85
+    running_state: configured
+    state: present
+  wait:
+    state: configured
+    sleep: 10
+    timeout: 300
+  tenant_console:
+    role: tenant-console
+    state: enabled

@@ -430,6 +430,70 @@ def validate_qos(result: ValidationResult) -> None:
 
 def validate_tenants(result: ValidationResult) -> None:
     """Validate tenant and VELOS partition var trees and cross-object references."""
+    tenant_ha_pair_objects = collect_objects(
+        VARS_ROOT / "tenants" / "intents" / "ha_pairs",
+        "tenant_ha_pairs",
+        result,
+        allowed_states=None,
+    )
+    for path, item in tenant_ha_pair_objects:
+        require_keys(result, path, item, ["name", "image", "tenant_defaults", "tenants", "wait", "bigip_handoff"], _name(item))
+        platform = item.get("platform", "rseries")
+        if platform not in {"rseries", "velos-partition"}:
+            result.add_error(path, "tenant HA intents must target `rseries` or `velos-partition`", _name(item))
+
+        image = _require_mapping(result, path, item.get("image"), "image", _name(item)) if "image" in item else None
+        if image:
+            require_keys(result, path, image, ["image_name"], _name(item))
+            if "protocol" in image and image["protocol"] not in {"scp", "sftp", "https"}:
+                result.add_error(path, "`image.protocol` must be `scp`, `sftp`, or `https`", _name(item))
+            if image.get("state", "import") == "import":
+                require_keys(result, path, image, ["remote_host", "remote_path"], _name(item))
+
+        tenant_defaults = _require_mapping(result, path, item.get("tenant_defaults"), "tenant_defaults", _name(item)) if "tenant_defaults" in item else None
+        if tenant_defaults:
+            require_keys(result, path, tenant_defaults, ["nodes", "mgmt_prefix", "mgmt_gateway", "vlans", "cpu_cores", "memory", "virtual_disk_size"], _name(item))
+            if "nodes" in tenant_defaults and not isinstance(tenant_defaults["nodes"], list):
+                result.add_error(path, "`tenant_defaults.nodes` must be a list", _name(item))
+            if "vlans" in tenant_defaults and not isinstance(tenant_defaults["vlans"], list):
+                result.add_error(path, "`tenant_defaults.vlans` must be a list", _name(item))
+            if "cryptos" in tenant_defaults and tenant_defaults["cryptos"] not in {"enabled", "disabled"}:
+                result.add_error(path, "`tenant_defaults.cryptos` must be `enabled` or `disabled`", _name(item))
+            if "running_state" in tenant_defaults and tenant_defaults["running_state"] not in {"configured", "provisioned", "deployed"}:
+                result.add_error(path, "`tenant_defaults.running_state` must be a valid tenant running state", _name(item))
+
+        tenants = _require_list_of_mappings(result, path, item.get("tenants"), "tenants", _name(item)) if "tenants" in item else None
+        if tenants is not None and len(tenants) != int(item.get("expected_members", 2)):
+            result.add_error(path, "`tenants` must contain exactly two members unless `expected_members` is set", _name(item))
+        tenant_names_for_intent: set[str] = set()
+        tenant_mgmt_ips: set[str] = set()
+        for tenant in tenants or []:
+            require_keys(result, path, tenant, ["name", "mgmt_ip"], _name(item))
+            tenant_name = tenant.get("name")
+            mgmt_ip = tenant.get("mgmt_ip")
+            if tenant_name in tenant_names_for_intent:
+                result.add_error(path, f"duplicate tenant name `{tenant_name}` in HA intent", _name(item))
+            if mgmt_ip in tenant_mgmt_ips:
+                result.add_error(path, f"duplicate tenant management IP `{mgmt_ip}` in HA intent", _name(item))
+            if isinstance(tenant_name, str):
+                tenant_names_for_intent.add(tenant_name)
+            if isinstance(mgmt_ip, str):
+                tenant_mgmt_ips.add(mgmt_ip)
+
+        wait = _require_mapping(result, path, item.get("wait"), "wait", _name(item)) if "wait" in item else None
+        if wait and wait.get("state", "configured") not in {"configured", "provisioned", "deployed", "ssh-ready", "api-ready"}:
+            result.add_error(path, "`wait.state` must be a valid f5os_tenant_wait state", _name(item))
+
+        console = item.get("tenant_console")
+        if console is not None:
+            console_mapping = _require_mapping(result, path, console, "tenant_console", _name(item))
+            if console_mapping and console_mapping.get("state", "enabled") not in {"enabled", "locked"}:
+                result.add_error(path, "`tenant_console.state` must be `enabled` or `locked`", _name(item))
+
+        handoff = _require_mapping(result, path, item.get("bigip_handoff"), "bigip_handoff", _name(item)) if "bigip_handoff" in item else None
+        if handoff:
+            require_keys(result, path, handoff, ["inventory_group", "cluster_name"], _name(item))
+
     tenant_objects = collect_objects(
         VARS_ROOT / "tenants" / "tenants",
         "tenants",

@@ -1,6 +1,18 @@
 # Tenants variable loader.
 # Builds aggregated raw collections from the tenants var tree and deletion tree.
 ---
+- name: Load tenant HA intent fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "tenant ha intents"
+    source_root: "{{ repo_root }}/vars/tenants/intents/ha_pairs"
+    deletion_root: ""
+    fragment_var_name: "tenant_ha_intent_fragment"
+    aggregate_var: "tenant_ha_intents_aggregate"
+    deletion_aggregate_var: "tenant_ha_intents_delete_aggregate"
+    collection_key: "tenant_ha_pairs"
+    defaults_key: "tenant_ha_pair_defaults"
+
 - name: Load tenant fragments
   ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
   vars:
@@ -84,3 +96,13 @@
     deletion_aggregate_var: "velos_partition_wait_delete_aggregate"
     collection_key: "velos_partition_waits"
     defaults_key: "velos_partition_wait_defaults"
+
+- name: Compile tenant HA intents
+  ansible.builtin.set_fact:
+    tenant_ha_compiled: "{{ tenant_ha_intents_aggregate | default([]) | compile_tenant_ha_intents }}"
+
+- name: Merge compiled tenant HA objects into canonical tenant collections
+  ansible.builtin.set_fact:
+    tenants_aggregate: "{{ tenants_aggregate | default([]) + (tenant_ha_compiled.tenants | default([])) }}"
+    tenant_wait_aggregate: "{{ tenant_wait_aggregate | default([]) + (tenant_ha_compiled.tenant_waits | default([])) }}"
+    tenant_console_aggregate: "{{ tenant_console_aggregate | default([]) + (tenant_ha_compiled.tenant_console_users | default([])) }}"

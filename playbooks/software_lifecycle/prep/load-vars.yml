@@ -1,6 +1,18 @@
 # Software lifecycle variable loader.
 # Builds aggregated raw collections from the software lifecycle var tree and deletion tree.
 ---
+- name: Load tenant HA intent fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "tenant ha intents"
+    source_root: "{{ repo_root }}/vars/tenants/intents/ha_pairs"
+    deletion_root: ""
+    fragment_var_name: "tenant_ha_intent_fragment"
+    aggregate_var: "tenant_ha_intents_aggregate"
+    deletion_aggregate_var: "tenant_ha_intents_delete_aggregate"
+    collection_key: "tenant_ha_pairs"
+    defaults_key: "tenant_ha_pair_defaults"
+
 - name: Load system image fragments
   ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
   vars:
@@ -48,3 +60,11 @@
     deletion_aggregate_var: "velos_partition_images_delete_aggregate"
     collection_key: "velos_partition_images"
     defaults_key: "velos_partition_image_defaults"
+
+- name: Compile tenant HA intents
+  ansible.builtin.set_fact:
+    tenant_ha_compiled: "{{ tenant_ha_intents_aggregate | default([]) | compile_tenant_ha_intents }}"
+
+- name: Merge compiled tenant HA images into canonical tenant image collection
+  ansible.builtin.set_fact:
+    tenant_images_aggregate: "{{ tenant_images_aggregate | default([]) + (tenant_ha_compiled.tenant_images | default([])) }}"

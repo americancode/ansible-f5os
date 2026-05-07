@@ -18,6 +18,12 @@ Each domain has:
 - `deletions/` trees for reverse-order removal input
 - support for nested directories and per-directory `settings.yml`
 
+Intent trees:
+
+- `vars/tenants/intents/ha_pairs/` contains higher-level BIG-IP HA pair authoring
+- HA pair intents compile into existing canonical runtime trees rather than adding a new F5OS module domain
+- concrete intent files should live under a first-level intent category, not directly under `vars/<domain>/intents/`
+
 Current `settings.yml` behavior:
 
 - fragment discovery is recursive within each object tree

@@ -20,6 +20,10 @@ Implemented domains:
 - `software_lifecycle`
 - `observability`
 
+Implemented intent layers:
+
+- `tenant_ha_intents`
+
 Current next domain:
 
 - cross-platform modeling and documentation hardening
