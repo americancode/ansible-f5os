@@ -1,0 +1,8 @@
+# System delete tasks.
+# Placeholder delete surface for reverse-order lifecycle handling once module mappings are implemented.
+---
+- name: Placeholder system delete summary
+  ansible.builtin.debug:
+    msg:
+      - "System delete runtime not implemented yet."
+      - "Delete collections are staged through prep and audit already."

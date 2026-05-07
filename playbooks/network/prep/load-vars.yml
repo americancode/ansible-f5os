@@ -1,0 +1,74 @@
+# Network variable loader.
+# Builds aggregated raw collections from the network var tree and deletion tree.
+---
+- name: Load network interface fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "network interfaces"
+    source_root: "{{ repo_root }}/vars/network/interfaces"
+    deletion_root: "{{ repo_root }}/vars/network/deletions/interfaces"
+    fragment_var_name: "network_interfaces_fragment"
+    aggregate_var: "network_interfaces_aggregate"
+    deletion_aggregate_var: "network_interfaces_delete_aggregate"
+    collection_key: "interfaces"
+    defaults_key: "interface_defaults"
+
+- name: Load network lag fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "network lags"
+    source_root: "{{ repo_root }}/vars/network/lags"
+    deletion_root: "{{ repo_root }}/vars/network/deletions/lags"
+    fragment_var_name: "network_lags_fragment"
+    aggregate_var: "network_lags_aggregate"
+    deletion_aggregate_var: "network_lags_delete_aggregate"
+    collection_key: "lags"
+    defaults_key: "lag_defaults"
+
+- name: Load network vlan fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "network vlans"
+    source_root: "{{ repo_root }}/vars/network/vlans"
+    deletion_root: "{{ repo_root }}/vars/network/deletions/vlans"
+    fragment_var_name: "network_vlans_fragment"
+    aggregate_var: "network_vlans_aggregate"
+    deletion_aggregate_var: "network_vlans_delete_aggregate"
+    collection_key: "vlans"
+    defaults_key: "vlan_defaults"
+
+- name: Load network fdb fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "network fdb"
+    source_root: "{{ repo_root }}/vars/network/fdb"
+    deletion_root: "{{ repo_root }}/vars/network/deletions/fdb"
+    fragment_var_name: "network_fdb_fragment"
+    aggregate_var: "network_fdb_aggregate"
+    deletion_aggregate_var: "network_fdb_delete_aggregate"
+    collection_key: "fdb_entries"
+    defaults_key: "fdb_defaults"
+
+- name: Load network LLDP fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "network lldp"
+    source_root: "{{ repo_root }}/vars/network/lldp"
+    deletion_root: "{{ repo_root }}/vars/network/deletions/lldp"
+    fragment_var_name: "network_lldp_fragment"
+    aggregate_var: "network_lldp_aggregate"
+    deletion_aggregate_var: "network_lldp_delete_aggregate"
+    collection_key: "lldp_configs"
+    defaults_key: "lldp_defaults"
+
+- name: Load network STP fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "network stp"
+    source_root: "{{ repo_root }}/vars/network/stp"
+    deletion_root: "{{ repo_root }}/vars/network/deletions/stp"
+    fragment_var_name: "network_stp_fragment"
+    aggregate_var: "network_stp_aggregate"
+    deletion_aggregate_var: "network_stp_delete_aggregate"
+    collection_key: "stp_configs"
+    defaults_key: "stp_defaults"

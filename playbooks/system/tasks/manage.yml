@@ -1,0 +1,14 @@
+# System manage tasks.
+# Runtime effect: dispatch either audit preview or runtime delete/apply for system object families using shared ordering.
+---
+- name: Audit planned system objects
+  ansible.builtin.import_tasks: audit.yml
+  when: audit_mode | default(false)
+
+- name: Remove managed objects
+  ansible.builtin.import_tasks: delete.yml
+  when: not (audit_mode | default(false))
+
+- name: Apply desired objects
+  ansible.builtin.import_tasks: apply.yml
+  when: not (audit_mode | default(false))

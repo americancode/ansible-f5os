@@ -1,0 +1,8 @@
+# Bootstrap prep orchestrator.
+# Produces canonical bootstrap runtime sets for licensing, primary key seeding, and management reachability.
+---
+- name: Load bootstrap var fragments
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/bootstrap/prep/load-vars.yml"
+
+- name: Build bootstrap runtime facts
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/bootstrap/prep/build-runtime.yml"

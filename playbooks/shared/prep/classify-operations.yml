@@ -1,0 +1,7 @@
+# Shared runtime classifier.
+# Splits an aggregated collection into present and delete lists using repo-standard operation flags.
+---
+- name: Classify {{ classification_label }} operations
+  ansible.builtin.set_fact:
+    "{{ present_var }}": "{{ source_items | classify_fragment_operations('present') }}"
+    "{{ delete_var }}": "{{ source_delete_items | classify_fragment_operations('delete') }}"

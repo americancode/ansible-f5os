@@ -1,0 +1,10 @@
+---
+# LLDP configuration examples for neighbor discovery policy.
+# These objects are consumed by the network playbook.
+# Supported fields: `name`, `enabled`, `tx_interval`, `hold_multiplier`, and `state`.
+lldp_configs:
+  - name: default-lldp
+    enabled: true
+    tx_interval: 30
+    hold_multiplier: 4
+    state: present

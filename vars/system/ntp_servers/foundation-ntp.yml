@@ -1,0 +1,11 @@
+---
+# NTP server examples for system clock synchronization.
+# These objects are consumed by the system playbook.
+# Supported fields: `name`, `servers`, `prefer`, and `state`.
+ntp_servers:
+  - name: primary-ntp
+    servers:
+      - 192.0.2.123
+      - 192.0.2.124
+    prefer: 192.0.2.123
+    state: present

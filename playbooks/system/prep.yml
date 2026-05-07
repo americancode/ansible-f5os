@@ -1,0 +1,8 @@
+# System prep orchestrator.
+# Produces canonical system runtime sets for shared appliance configuration and access policy objects.
+---
+- name: Load system var fragments
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/system/prep/load-vars.yml"
+
+- name: Build system runtime facts
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/system/prep/build-runtime.yml"

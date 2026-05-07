@@ -1,0 +1,11 @@
+# Shared audit collection printer.
+# Prints one final runtime collection in the same shape used by delete/apply execution.
+---
+- name: Print {{ audit_phase }} collection {{ audit_collection_name }}
+  ansible.builtin.debug:
+    msg:
+      phase: "{{ audit_phase }}"
+      collection: "{{ audit_collection_name }}"
+      count: "{{ audit_collection_items | length }}"
+      items: "{{ audit_collection_items }}"
+  when: audit_show_empty | default(false) or (audit_collection_items | length > 0)

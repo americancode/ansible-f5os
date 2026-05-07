@@ -1,0 +1,92 @@
+# System runtime builder.
+# Shapes aggregated system fragments into final present/delete collections consumed by audit and runtime tasks.
+---
+- name: Classify system settings operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system settings"
+    source_items: "{{ system_settings_aggregate | default([]) }}"
+    source_delete_items: "{{ system_settings_delete_aggregate | default([]) }}"
+    present_var: "system_settings_present"
+    delete_var: "system_settings_delete"
+
+- name: Classify system DNS operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system dns"
+    source_items: "{{ system_dns_aggregate | default([]) }}"
+    source_delete_items: "{{ system_dns_delete_aggregate | default([]) }}"
+    present_var: "system_dns_present"
+    delete_var: "system_dns_delete"
+
+- name: Classify system NTP operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system ntp"
+    source_items: "{{ system_ntp_aggregate | default([]) }}"
+    source_delete_items: "{{ system_ntp_delete_aggregate | default([]) }}"
+    present_var: "system_ntp_present"
+    delete_var: "system_ntp_delete"
+
+- name: Classify system logging operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system logging"
+    source_items: "{{ system_logging_aggregate | default([]) }}"
+    source_delete_items: "{{ system_logging_delete_aggregate | default([]) }}"
+    present_var: "system_logging_present"
+    delete_var: "system_logging_delete"
+
+- name: Classify system allowed IP operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system allowed ips"
+    source_items: "{{ system_allowed_ips_aggregate | default([]) }}"
+    source_delete_items: "{{ system_allowed_ips_delete_aggregate | default([]) }}"
+    present_var: "system_allowed_ips_present"
+    delete_var: "system_allowed_ips_delete"
+
+- name: Classify system auth operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system auth"
+    source_items: "{{ system_auth_aggregate | default([]) }}"
+    source_delete_items: "{{ system_auth_delete_aggregate | default([]) }}"
+    present_var: "system_auth_present"
+    delete_var: "system_auth_delete"
+
+- name: Classify system auth server operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system auth servers"
+    source_items: "{{ system_auth_servers_aggregate | default([]) }}"
+    source_delete_items: "{{ system_auth_servers_delete_aggregate | default([]) }}"
+    present_var: "system_auth_servers_present"
+    delete_var: "system_auth_servers_delete"
+
+- name: Classify system user operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system users"
+    source_items: "{{ system_users_aggregate | default([]) }}"
+    source_delete_items: "{{ system_users_delete_aggregate | default([]) }}"
+    present_var: "system_users_present"
+    delete_var: "system_users_delete"
+
+- name: Classify system TLS operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system tls"
+    source_items: "{{ system_tls_aggregate | default([]) }}"
+    source_delete_items: "{{ system_tls_delete_aggregate | default([]) }}"
+    present_var: "system_tls_present"
+    delete_var: "system_tls_delete"
+
+- name: Classify system SNMP operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system snmp"
+    source_items: "{{ system_snmp_aggregate | default([]) }}"
+    source_delete_items: "{{ system_snmp_delete_aggregate | default([]) }}"
+    present_var: "system_snmp_present"
+    delete_var: "system_snmp_delete"

@@ -1,0 +1,56 @@
+# Network runtime builder.
+# Shapes aggregated network fragments into final present/delete collections consumed by audit and runtime tasks.
+---
+- name: Classify network interface operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "network interfaces"
+    source_items: "{{ network_interfaces_aggregate | default([]) }}"
+    source_delete_items: "{{ network_interfaces_delete_aggregate | default([]) }}"
+    present_var: "network_interfaces_present"
+    delete_var: "network_interfaces_delete"
+
+- name: Classify network lag operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "network lags"
+    source_items: "{{ network_lags_aggregate | default([]) }}"
+    source_delete_items: "{{ network_lags_delete_aggregate | default([]) }}"
+    present_var: "network_lags_present"
+    delete_var: "network_lags_delete"
+
+- name: Classify network VLAN operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "network vlans"
+    source_items: "{{ network_vlans_aggregate | default([]) }}"
+    source_delete_items: "{{ network_vlans_delete_aggregate | default([]) }}"
+    present_var: "network_vlans_present"
+    delete_var: "network_vlans_delete"
+
+- name: Classify network FDB operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "network fdb"
+    source_items: "{{ network_fdb_aggregate | default([]) }}"
+    source_delete_items: "{{ network_fdb_delete_aggregate | default([]) }}"
+    present_var: "network_fdb_present"
+    delete_var: "network_fdb_delete"
+
+- name: Classify network LLDP operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "network lldp"
+    source_items: "{{ network_lldp_aggregate | default([]) }}"
+    source_delete_items: "{{ network_lldp_delete_aggregate | default([]) }}"
+    present_var: "network_lldp_present"
+    delete_var: "network_lldp_delete"
+
+- name: Classify network STP operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "network stp"
+    source_items: "{{ network_stp_aggregate | default([]) }}"
+    source_delete_items: "{{ network_stp_delete_aggregate | default([]) }}"
+    present_var: "network_stp_present"
+    delete_var: "network_stp_delete"

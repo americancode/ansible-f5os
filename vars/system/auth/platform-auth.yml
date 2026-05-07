@@ -1,0 +1,10 @@
+---
+# Auth configuration examples for local and remote authentication behavior.
+# These objects are consumed by the system playbook and may reference entries in `vars/system/auth_servers/`.
+# Supported fields: `name`, `method`, `server_group`, `fallback_local`, and `state`.
+auth_configs:
+  - name: radius-auth
+    method: radius
+    server_group: corporate-radius
+    fallback_local: true
+    state: present

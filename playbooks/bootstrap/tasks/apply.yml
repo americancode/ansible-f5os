@@ -1,0 +1,10 @@
+# Bootstrap apply tasks.
+# Placeholder runtime surface for bootstrap objects. Module calls will be added once the canonical field model is finalized.
+---
+- name: Placeholder bootstrap apply summary
+  ansible.builtin.debug:
+    msg:
+      - "Bootstrap runtime not implemented yet."
+      - "Licenses: {{ bootstrap_licenses_present | length }}"
+      - "Primary keys: {{ bootstrap_primary_keys_present | length }}"
+      - "Management interfaces: {{ bootstrap_management_interfaces_present | length }}"

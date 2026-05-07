@@ -1,0 +1,38 @@
+# Bootstrap variable loader.
+# Builds aggregated raw collections from the bootstrap var tree and deletion tree.
+---
+- name: Load bootstrap license fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "bootstrap license"
+    source_root: "{{ repo_root }}/vars/bootstrap/license"
+    deletion_root: "{{ repo_root }}/vars/bootstrap/deletions/license"
+    fragment_var_name: "bootstrap_license_fragment"
+    aggregate_var: "bootstrap_license_aggregate"
+    deletion_aggregate_var: "bootstrap_license_delete_aggregate"
+    collection_key: "licenses"
+    defaults_key: "license_defaults"
+
+- name: Load bootstrap primary key fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "bootstrap primary key"
+    source_root: "{{ repo_root }}/vars/bootstrap/primarykey"
+    deletion_root: "{{ repo_root }}/vars/bootstrap/deletions/primarykey"
+    fragment_var_name: "bootstrap_primarykey_fragment"
+    aggregate_var: "bootstrap_primarykey_aggregate"
+    deletion_aggregate_var: "bootstrap_primarykey_delete_aggregate"
+    collection_key: "primary_keys"
+    defaults_key: "primarykey_defaults"
+
+- name: Load bootstrap management interface fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "bootstrap management interface"
+    source_root: "{{ repo_root }}/vars/bootstrap/management_interfaces"
+    deletion_root: "{{ repo_root }}/vars/bootstrap/deletions/management_interfaces"
+    fragment_var_name: "bootstrap_management_fragment"
+    aggregate_var: "bootstrap_management_aggregate"
+    deletion_aggregate_var: "bootstrap_management_delete_aggregate"
+    collection_key: "management_interfaces"
+    defaults_key: "management_interface_defaults"

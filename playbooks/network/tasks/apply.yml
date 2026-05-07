@@ -1,0 +1,11 @@
+# Network apply tasks.
+# Placeholder runtime surface for F5OS network configuration objects.
+---
+- name: Placeholder network apply summary
+  ansible.builtin.debug:
+    msg:
+      - "Network runtime not implemented yet."
+      - "Interfaces: {{ network_interfaces_present | length }}"
+      - "LAGs: {{ network_lags_present | length }}"
+      - "VLANs: {{ network_vlans_present | length }}"
+      - "FDB entries: {{ network_fdb_present | length }}"

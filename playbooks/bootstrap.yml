@@ -1,0 +1,23 @@
+# Bootstrap entrypoint.
+# Loads `vars/common.yml` and runs bootstrap prep before applying bootstrap runtime tasks.
+---
+- name: Configure F5OS bootstrap state
+  hosts: all
+  connection: local
+  gather_facts: false
+  collections:
+    - f5networks.f5os
+
+  vars:
+    repo_root: "{{ playbook_dir }}/.."
+
+  vars_files:
+    - "{{ repo_root }}/vars/common.yml"
+
+  pre_tasks:
+    - name: Prepare bootstrap inputs
+      ansible.builtin.import_tasks: bootstrap/prep.yml
+
+  tasks:
+    - name: Manage bootstrap objects
+      ansible.builtin.import_tasks: bootstrap/tasks/manage.yml

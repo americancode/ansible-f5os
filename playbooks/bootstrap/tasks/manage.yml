@@ -1,0 +1,14 @@
+# Bootstrap manage tasks.
+# Runtime effect: dispatch audit preview or bootstrap runtime tasks. Delete remains intentionally empty for bootstrap actions.
+---
+- name: Audit planned bootstrap objects
+  ansible.builtin.import_tasks: audit.yml
+  when: audit_mode | default(false)
+
+- name: Remove managed bootstrap objects
+  ansible.builtin.import_tasks: delete.yml
+  when: not (audit_mode | default(false))
+
+- name: Apply desired bootstrap objects
+  ansible.builtin.import_tasks: apply.yml
+  when: not (audit_mode | default(false))

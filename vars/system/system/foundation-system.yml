@@ -1,0 +1,11 @@
+---
+# System setting examples for shared appliance identity and baseline behavior.
+# These objects are referenced only by the system playbook.
+# Supported fields: `name`, `hostname`, `contact`, `location`, `timezone`, and `state`.
+systems:
+  - name: platform-system
+    hostname: f5os-platform-a.example.com
+    contact: network-team@example.com
+    location: primary-datacenter
+    timezone: UTC
+    state: present

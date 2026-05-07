@@ -1,0 +1,21 @@
+# Bootstrap audit tasks.
+# Runtime effect: prints planned bootstrap collections before any F5OS module calls.
+---
+- name: Announce bootstrap audit mode
+  ansible.builtin.debug:
+    msg:
+      - "AUDIT MODE bootstrap for {{ inventory_hostname }} -> {{ provider.server }}"
+      - "No F5OS changes will be made."
+
+- name: Print bootstrap apply collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "APPLY"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "bootstrap_licenses_present", items: "{{ bootstrap_licenses_present | default([]) }}" }
+    - { name: "bootstrap_primary_keys_present", items: "{{ bootstrap_primary_keys_present | default([]) }}" }
+    - { name: "bootstrap_management_interfaces_present", items: "{{ bootstrap_management_interfaces_present | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"

@@ -1,0 +1,11 @@
+---
+# VLAN examples for tenant and service attachment.
+# These objects may reference interfaces or LAGs from the network domain.
+# Supported fields: `name`, `vlan_id`, `interfaces`, `description`, and `state`.
+vlans:
+  - name: tenant-frontend
+    vlan_id: 110
+    interfaces:
+      - lag10
+    description: frontend-tenant-vlan
+    state: present

@@ -1,0 +1,10 @@
+---
+# TLS cert/key examples for system services.
+# These objects are consumed by the system playbook.
+# Supported fields: `name`, `certificate`, `private_key`, `passphrase`, and `state`.
+tls_cert_keys:
+  - name: management-ui
+    certificate: /path/to/cert.pem
+    private_key: /path/to/key.pem
+    passphrase: ""
+    state: present

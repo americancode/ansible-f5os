@@ -1,0 +1,11 @@
+---
+# Auth server examples for external AAA integration.
+# These objects are referenced by auth configs in `vars/system/auth/`.
+# Supported fields: `name`, `type`, `address`, `port`, `secret`, and `state`.
+auth_servers:
+  - name: corporate-radius
+    type: radius
+    address: 192.0.2.200
+    port: 1812
+    secret: CHANGEME-RADIUS-SECRET
+    state: present

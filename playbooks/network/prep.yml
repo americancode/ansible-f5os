@@ -1,0 +1,8 @@
+# Network prep orchestrator.
+# Produces canonical network runtime sets for interfaces, lags, vlans, forwarding entries, and link-layer policy objects.
+---
+- name: Load network var fragments
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/network/prep/load-vars.yml"
+
+- name: Build network runtime facts
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/network/prep/build-runtime.yml"

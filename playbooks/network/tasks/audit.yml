@@ -1,0 +1,40 @@
+# Network audit tasks.
+# Runtime effect: prints planned network delete/apply collections before any F5OS module calls.
+---
+- name: Announce network audit mode
+  ansible.builtin.debug:
+    msg:
+      - "AUDIT MODE network for {{ inventory_hostname }} -> {{ provider.server }}"
+      - "No F5OS changes will be made."
+
+- name: Print network delete collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "DELETE"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "network_fdb_delete", items: "{{ network_fdb_delete | default([]) }}" }
+    - { name: "network_vlans_delete", items: "{{ network_vlans_delete | default([]) }}" }
+    - { name: "network_lags_delete", items: "{{ network_lags_delete | default([]) }}" }
+    - { name: "network_interfaces_delete", items: "{{ network_interfaces_delete | default([]) }}" }
+    - { name: "network_lldp_delete", items: "{{ network_lldp_delete | default([]) }}" }
+    - { name: "network_stp_delete", items: "{{ network_stp_delete | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Print network apply collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "APPLY"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "network_interfaces_present", items: "{{ network_interfaces_present | default([]) }}" }
+    - { name: "network_lags_present", items: "{{ network_lags_present | default([]) }}" }
+    - { name: "network_vlans_present", items: "{{ network_vlans_present | default([]) }}" }
+    - { name: "network_fdb_present", items: "{{ network_fdb_present | default([]) }}" }
+    - { name: "network_lldp_present", items: "{{ network_lldp_present | default([]) }}" }
+    - { name: "network_stp_present", items: "{{ network_stp_present | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"

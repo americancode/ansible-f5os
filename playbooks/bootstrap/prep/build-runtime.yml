@@ -1,0 +1,29 @@
+# Bootstrap runtime builder.
+# Shapes aggregated bootstrap fragments into final present/delete collections consumed by audit and runtime tasks.
+---
+- name: Classify bootstrap license operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "bootstrap licenses"
+    source_items: "{{ bootstrap_license_aggregate | default([]) }}"
+    source_delete_items: "{{ bootstrap_license_delete_aggregate | default([]) }}"
+    present_var: "bootstrap_licenses_present"
+    delete_var: "bootstrap_licenses_delete"
+
+- name: Classify bootstrap primary key operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "bootstrap primary keys"
+    source_items: "{{ bootstrap_primarykey_aggregate | default([]) }}"
+    source_delete_items: "{{ bootstrap_primarykey_delete_aggregate | default([]) }}"
+    present_var: "bootstrap_primary_keys_present"
+    delete_var: "bootstrap_primary_keys_delete"
+
+- name: Classify bootstrap management operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "bootstrap management interfaces"
+    source_items: "{{ bootstrap_management_aggregate | default([]) }}"
+    source_delete_items: "{{ bootstrap_management_delete_aggregate | default([]) }}"
+    present_var: "bootstrap_management_interfaces_present"
+    delete_var: "bootstrap_management_interfaces_delete"

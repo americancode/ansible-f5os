@@ -1,0 +1,23 @@
+# Network entrypoint.
+# Loads `vars/common.yml` and runs network prep before applying canonical network runtime tasks.
+---
+- name: Configure F5OS network objects
+  hosts: all
+  connection: local
+  gather_facts: false
+  collections:
+    - f5networks.f5os
+
+  vars:
+    repo_root: "{{ playbook_dir }}/.."
+
+  vars_files:
+    - "{{ repo_root }}/vars/common.yml"
+
+  pre_tasks:
+    - name: Prepare network inputs
+      ansible.builtin.import_tasks: network/prep.yml
+
+  tasks:
+    - name: Manage network objects
+      ansible.builtin.import_tasks: network/tasks/manage.yml

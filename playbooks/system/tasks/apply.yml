@@ -1,0 +1,11 @@
+# System apply tasks.
+# Placeholder runtime surface for shared F5OS system configuration objects.
+---
+- name: Placeholder system apply summary
+  ansible.builtin.debug:
+    msg:
+      - "System runtime not implemented yet."
+      - "System settings: {{ system_settings_present | length }}"
+      - "DNS: {{ system_dns_present | length }}"
+      - "NTP: {{ system_ntp_present | length }}"
+      - "Users: {{ system_users_present | length }}"

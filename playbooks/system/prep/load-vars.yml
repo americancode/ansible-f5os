@@ -1,0 +1,122 @@
+# System variable loader.
+# Builds aggregated raw collections from the system var tree and deletion tree.
+---
+- name: Load system setting fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system settings"
+    source_root: "{{ repo_root }}/vars/system/system"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/system"
+    fragment_var_name: "system_settings_fragment"
+    aggregate_var: "system_settings_aggregate"
+    deletion_aggregate_var: "system_settings_delete_aggregate"
+    collection_key: "systems"
+    defaults_key: "system_defaults"
+
+- name: Load system DNS fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system dns"
+    source_root: "{{ repo_root }}/vars/system/dns"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/dns"
+    fragment_var_name: "system_dns_fragment"
+    aggregate_var: "system_dns_aggregate"
+    deletion_aggregate_var: "system_dns_delete_aggregate"
+    collection_key: "dns_servers"
+    defaults_key: "dns_defaults"
+
+- name: Load system NTP fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system ntp"
+    source_root: "{{ repo_root }}/vars/system/ntp_servers"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/ntp_servers"
+    fragment_var_name: "system_ntp_fragment"
+    aggregate_var: "system_ntp_aggregate"
+    deletion_aggregate_var: "system_ntp_delete_aggregate"
+    collection_key: "ntp_servers"
+    defaults_key: "ntp_defaults"
+
+- name: Load system logging fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system logging"
+    source_root: "{{ repo_root }}/vars/system/logging"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/logging"
+    fragment_var_name: "system_logging_fragment"
+    aggregate_var: "system_logging_aggregate"
+    deletion_aggregate_var: "system_logging_delete_aggregate"
+    collection_key: "logging_profiles"
+    defaults_key: "logging_defaults"
+
+- name: Load system allowed IP fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system allowed ips"
+    source_root: "{{ repo_root }}/vars/system/allowed_ips"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/allowed_ips"
+    fragment_var_name: "system_allowed_ips_fragment"
+    aggregate_var: "system_allowed_ips_aggregate"
+    deletion_aggregate_var: "system_allowed_ips_delete_aggregate"
+    collection_key: "allowed_ip_sets"
+    defaults_key: "allowed_ips_defaults"
+
+- name: Load system auth fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system auth"
+    source_root: "{{ repo_root }}/vars/system/auth"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/auth"
+    fragment_var_name: "system_auth_fragment"
+    aggregate_var: "system_auth_aggregate"
+    deletion_aggregate_var: "system_auth_delete_aggregate"
+    collection_key: "auth_configs"
+    defaults_key: "auth_defaults"
+
+- name: Load system auth server fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system auth servers"
+    source_root: "{{ repo_root }}/vars/system/auth_servers"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/auth_servers"
+    fragment_var_name: "system_auth_servers_fragment"
+    aggregate_var: "system_auth_servers_aggregate"
+    deletion_aggregate_var: "system_auth_servers_delete_aggregate"
+    collection_key: "auth_servers"
+    defaults_key: "auth_server_defaults"
+
+- name: Load system user fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system users"
+    source_root: "{{ repo_root }}/vars/system/users"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/users"
+    fragment_var_name: "system_users_fragment"
+    aggregate_var: "system_users_aggregate"
+    deletion_aggregate_var: "system_users_delete_aggregate"
+    collection_key: "users"
+    defaults_key: "user_defaults"
+
+- name: Load system TLS fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system tls"
+    source_root: "{{ repo_root }}/vars/system/tls"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/tls"
+    fragment_var_name: "system_tls_fragment"
+    aggregate_var: "system_tls_aggregate"
+    deletion_aggregate_var: "system_tls_delete_aggregate"
+    collection_key: "tls_cert_keys"
+    defaults_key: "tls_defaults"
+
+- name: Load system SNMP fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system snmp"
+    source_root: "{{ repo_root }}/vars/system/snmp"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/snmp"
+    fragment_var_name: "system_snmp_fragment"
+    aggregate_var: "system_snmp_aggregate"
+    deletion_aggregate_var: "system_snmp_delete_aggregate"
+    collection_key: "snmp_configs"
+    defaults_key: "snmp_defaults"

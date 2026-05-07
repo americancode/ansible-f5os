@@ -1,0 +1,10 @@
+---
+# STP configuration examples for loop prevention policy.
+# These objects are consumed by the network playbook.
+# Supported fields: `name`, `enabled`, `mode`, `priority`, and `state`.
+stp_configs:
+  - name: default-stp
+    enabled: true
+    mode: rstp
+    priority: 32768
+    state: present

@@ -1,0 +1,9 @@
+---
+# Bootstrap primary key examples for initial controller trust seeding.
+# These objects are consumed only during bootstrap and are not auto-deleted later.
+# Supported fields: `name`, `primary_key`, `passphrase`, and `state`.
+primary_keys:
+  - name: foundation-primary-key
+    primary_key: CHANGEME-PRIMARY-KEY
+    passphrase: CHANGEME-PASSPHRASE
+    state: present

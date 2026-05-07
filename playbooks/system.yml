@@ -1,0 +1,23 @@
+# System entrypoint.
+# Loads `vars/common.yml` and runs system prep before applying canonical system runtime tasks.
+---
+- name: Configure F5OS system objects
+  hosts: all
+  connection: local
+  gather_facts: false
+  collections:
+    - f5networks.f5os
+
+  vars:
+    repo_root: "{{ playbook_dir }}/.."
+
+  vars_files:
+    - "{{ repo_root }}/vars/common.yml"
+
+  pre_tasks:
+    - name: Prepare system inputs
+      ansible.builtin.import_tasks: system/prep.yml
+
+  tasks:
+    - name: Manage system objects
+      ansible.builtin.import_tasks: system/tasks/manage.yml

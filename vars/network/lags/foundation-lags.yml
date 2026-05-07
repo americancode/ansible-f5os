@@ -1,0 +1,12 @@
+---
+# LAG examples for aggregated uplink configuration.
+# These objects may reference interface names from `vars/network/interfaces/`.
+# Supported fields: `name`, `members`, `lacp_mode`, `description`, and `state`.
+lags:
+  - name: lag10
+    members:
+      - 1.0
+      - 1.1
+    lacp_mode: active
+    description: uplink-bundle
+    state: present
