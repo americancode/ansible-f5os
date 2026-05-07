@@ -1,11 +1,13 @@
 ---
 # Bootstrap management interface examples for first control-plane reachability.
 # These objects seed rSeries or VELOS controller access before normal AWX-driven operations.
-# Supported fields: `name`, `platform`, `address`, `prefix_length`, `gateway`, and `state`.
+# Supported fields: `name`, `platform`, `dhcp`, `ipv4`, `ipv6`, and `state`.
 management_interfaces:
   - name: mgmt0
     platform: rseries
-    address: 192.0.2.10
-    prefix_length: 24
-    gateway: 192.0.2.1
+    dhcp: false
+    ipv4:
+      ip_address: 192.0.2.10
+      prefix_length: 24
+      gateway: 192.0.2.1
     state: present

@@ -1,3 +1,13 @@
 # Bootstrap delete tasks.
 # Intentionally empty: bootstrap actions are day-0 operations that are not auto-reversed by the canonical workflow.
 ---
+- name: Reject bootstrap deletion requests
+  ansible.builtin.assert:
+    that:
+      - (bootstrap_licenses_delete | default([]) | length) == 0
+      - (bootstrap_primary_keys_delete | default([]) | length) == 0
+      - (bootstrap_management_interfaces_delete | default([]) | length) == 0
+    fail_msg: >-
+      Bootstrap delete input was provided, but the F5OS bootstrap modules do not
+      support a normal absent lifecycle. Remove the deletion fragments and use a
+      day-0 recovery workflow instead.

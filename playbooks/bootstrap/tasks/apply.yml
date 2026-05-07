@@ -1,10 +1,56 @@
 # Bootstrap apply tasks.
-# Placeholder runtime surface for bootstrap objects. Module calls will be added once the canonical field model is finalized.
+# Runtime effect: applies bootstrap-only license, primary-key, and first management-interface configuration.
 ---
-- name: Placeholder bootstrap apply summary
-  ansible.builtin.debug:
-    msg:
-      - "Bootstrap runtime not implemented yet."
-      - "Licenses: {{ bootstrap_licenses_present | length }}"
-      - "Primary keys: {{ bootstrap_primary_keys_present | length }}"
-      - "Management interfaces: {{ bootstrap_management_interfaces_present | length }}"
+- name: Apply F5OS license activation
+  f5os_license:
+    registration_key: "{{ item.registration_key }}"
+    addon_keys: "{{ item.addon_keys | default(omit) }}"
+    license_server: "{{ item.license_server | default(omit) }}"
+    state: present
+  loop: "{{ bootstrap_licenses_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default(item.registration_key) }}"
+
+- name: Apply F5OS primary key
+  f5os_primarykey:
+    passphrase: "{{ item.passphrase }}"
+    salt: "{{ item.salt }}"
+    force_update: "{{ item.force_update | default(omit) }}"
+    state: present
+  loop: "{{ bootstrap_primary_keys_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('primary-key') }}"
+
+- name: Apply rSeries management interface bootstrap
+  rseries_management_interfaces:
+    dhcp: "{{ item.dhcp }}"
+    ipv4: "{{ item.ipv4 | default(omit) }}"
+    ipv6: "{{ item.ipv6 | default(omit) }}"
+    state: present
+  loop: >-
+    {{
+      (bootstrap_management_interfaces_present | default([]))
+      | selectattr('platform', 'undefined')
+      | list
+      +
+      (
+        (bootstrap_management_interfaces_present | default([]))
+        | selectattr('platform', 'defined')
+        | selectattr('platform', 'equalto', 'rseries')
+        | list
+      )
+    }}
+  loop_control:
+    label: "{{ item.name | default('rseries-management') }}"
+  when: (item.platform | default(platform_type)) == 'rseries'
+
+- name: Apply VELOS controller management interface bootstrap
+  velos_controller_management_interfaces:
+    dhcp: "{{ item.dhcp }}"
+    ipv4: "{{ item.ipv4 | default(omit) }}"
+    ipv6: "{{ item.ipv6 | default(omit) }}"
+    state: present
+  loop: "{{ bootstrap_management_interfaces_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('velos-controller-management') }}"
+  when: (item.platform | default(platform_type)) == 'velos'

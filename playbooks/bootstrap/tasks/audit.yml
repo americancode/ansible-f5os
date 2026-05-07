@@ -7,6 +7,19 @@
       - "AUDIT MODE bootstrap for {{ inventory_hostname }} -> {{ provider.server }}"
       - "No F5OS changes will be made."
 
+- name: Print bootstrap delete collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "DELETE"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "bootstrap_licenses_delete", items: "{{ bootstrap_licenses_delete | default([]) }}" }
+    - { name: "bootstrap_primary_keys_delete", items: "{{ bootstrap_primary_keys_delete | default([]) }}" }
+    - { name: "bootstrap_management_interfaces_delete", items: "{{ bootstrap_management_interfaces_delete | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"
+
 - name: Print bootstrap apply collections
   ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
   vars:

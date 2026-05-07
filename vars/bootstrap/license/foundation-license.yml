@@ -1,9 +1,10 @@
 ---
 # Bootstrap license examples for initial platform activation.
 # These objects are consumed by the bootstrap playbook and should remain day-0 only.
-# Supported fields: `name`, `license_key`, `eula_accepted`, and `state`.
+# Supported fields: `name`, `registration_key`, `addon_keys`, `license_server`, and `state`.
 licenses:
   - name: base-license
-    license_key: CHANGEME-LICENSE-KEY
-    eula_accepted: true
+    registration_key: CHANGEME-LICENSE-KEY
+    addon_keys: []
+    license_server: activate.f5.com
     state: present

@@ -3,7 +3,7 @@
 ---
 - name: Configure F5OS bootstrap state
   hosts: all
-  connection: local
+  connection: httpapi
   gather_facts: false
   collections:
     - f5networks.f5os

@@ -3,7 +3,7 @@
 ---
 - name: Configure F5OS network objects
   hosts: all
-  connection: local
+  connection: httpapi
   gather_facts: false
   collections:
     - f5networks.f5os
