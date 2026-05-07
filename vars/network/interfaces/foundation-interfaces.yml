@@ -9,3 +9,9 @@ interfaces:
     mtu: 1500
     description: uplink-a
     state: present
+  - name: 1.1
+    enabled: true
+    speed: auto
+    mtu: 1500
+    description: uplink-b
+    state: present

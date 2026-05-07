@@ -1,6 +1,7 @@
 """Runtime handlers for helper-tool entrypoints."""
 
 from tools.f5os_tools.specs import COVERAGE
+from tools.f5os_tools.validate.validator import Validator
 
 
 def _print_placeholder(tool_name: str) -> int:
@@ -11,8 +12,8 @@ def _print_placeholder(tool_name: str) -> int:
 
 
 def run_validate() -> int:
-    """Run placeholder var validation."""
-    return _print_placeholder("validate-vars")
+    """Run repo var validation."""
+    return Validator().run()
 
 
 def run_drift_check() -> int:

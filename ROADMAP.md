@@ -2,65 +2,31 @@
 
 ## To Do
 
-1. Establish the repo baseline to match the `ansible-bigip` operating model, adapted for F5OS.
-   - Create canonical playbook entrypoints under `playbooks/` and optional root-level compatibility wrappers.
-   - Mirror the split var-tree approach with per-domain directories, deletion trees, and layered `settings.yml` inheritance.
-   - Mirror the Python tooling style:
-     - `tools/validate-vars.py`
-     - `tools/drift-check.py`
-     - `tools/import-from-f5os.py`
-     - `filter_plugins/f5os_var_filters.py`
-     - `filter_plugins/f5os_filters/`
-   - Add shared prep loaders under `playbooks/shared/prep/` so domain playbooks can reuse recursive fragment discovery and hierarchical settings inheritance.
+1. Add immediate repository parity for CI and helper-tool execution.
+   - Add `.gitlab-ci.yml` equivalent to the reference repo's validate and drift stages.
+   - Add `Makefile` targets equivalent to:
+     - `validate`
+     - `validate-vars`
+     - `validate-ansible`
+   - Add syntax-check coverage for the currently implemented canonical playbooks:
+     - `playbooks/bootstrap.yml`
+     - `playbooks/system.yml`
+     - `playbooks/network.yml`
+   - Keep the CI and local validation contract aligned so `make validate` is the single operator entrypoint both locally and in GitLab CI.
 
-2. Build the `bootstrap` domain for day-0 reachability and initial platform activation.
-   - Completion target: `runtime+validation`
-   - Keep deletion intentionally empty for bootstrap-only actions.
-   - Module coverage:
-     - `f5os_license`
-     - `f5os_primarykey`
-     - `rseries_management_interfaces`
-     - `velos_controller_management_interfaces`
-   - Var tree targets:
-     - `vars/bootstrap/license/`
-     - `vars/bootstrap/primarykey/`
-     - `vars/bootstrap/management_interfaces/`
-     - `vars/bootstrap/deletions/`
-   - Docs target:
-     - bootstrap execution model
-     - controller reachability handoff to AWX
-     - platform split between rSeries and VELOS management endpoints
+2. Replace placeholder Python tooling with real F5OS-aware implementations.
+   - Convert `tools/validate-vars.py` plus `tools/f5os_tools/` into a real validator package with domain-aware checks for:
+     - `bootstrap`
+     - `system`
+     - `network`
+   - Decide and document initial helper-tool fidelity per implemented domain:
+     - `bootstrap`: likely `unsupported` or `runtime+validation` only
+     - `system`: `unsupported` or `identity-only` until a real drift model exists
+     - `network`: `unsupported` or `identity-only` until a real drift model exists
+   - Replace placeholder `drift-check` behavior with an explicit F5OS coverage contract instead of generic placeholder output.
+   - Replace placeholder `import-from-f5os` behavior with an explicit F5OS coverage contract instead of generic placeholder output.
 
-3. Build the `system` domain for shared appliance configuration and access policy.
-   - Completion target: `runtime+validation+helper-tools`
-   - Initial helper-tool fidelity target: `basic field drift`
-   - Module coverage:
-     - `f5os_system`
-     - `f5os_dns`
-     - `f5os_ntp_server`
-     - `f5os_logging`
-     - `f5os_allowed_ips`
-     - `f5os_auth`
-     - `f5os_auth_server`
-     - `f5os_user`
-     - `f5os_user_password_change`
-     - `f5os_tls_cert_key`
-     - `f5os_snmp`
-   - Decide whether `f5os_lldp_config` and `f5os_stp_config` live here or under `network`; document one canonical home and keep helper tools consistent with it.
-   - Var tree targets:
-     - `vars/system/system/`
-     - `vars/system/dns/`
-     - `vars/system/ntp_servers/`
-     - `vars/system/logging/`
-     - `vars/system/allowed_ips/`
-     - `vars/system/auth/`
-     - `vars/system/auth_servers/`
-     - `vars/system/users/`
-     - `vars/system/tls/`
-     - `vars/system/snmp/`
-     - `vars/system/deletions/<type>/`
-
-4. Build the `network` domain for platform networking primitives.
+3. Build the `network` domain for platform networking primitives.
    - Completion target: `runtime+validation+helper-tools`
    - Initial helper-tool fidelity target: `basic field drift`
    - Module coverage:
@@ -83,6 +49,12 @@
      - `vars/network/lldp/`
      - `vars/network/stp/`
      - `vars/network/deletions/<type>/`
+
+4. Raise the shared loader and var-tree behavior to reference-repo parity.
+   - The current recursive fragment/filter layer is only scaffold-level.
+   - Add real hierarchical `settings.yml` inheritance across nested directories.
+   - Add domain-aware validation for fragment shapes, required fields, and cross-file references.
+   - Keep the runtime field model, example var files, and validation logic aligned.
 
 5. Build a dedicated `qos` domain unless early implementation shows the objects fit cleanly inside `network` without making it noisy.
    - Completion target: `runtime+validation+helper-tools`
@@ -164,7 +136,7 @@
      - `identity-only`
      - `basic field drift`
      - `model-aware`
-   - `import-from-f5os` must use the same canonical var model that runtime playbooks consume.
+     - `import-from-f5os` must use the same canonical var model that runtime playbooks consume.
    - Do not mark a domain complete if runtime schemas and helper-tool schemas diverge.
 
 11. Add the supporting documentation set after the first domain skeletons exist.
@@ -172,12 +144,11 @@
    - `docs/playbook-structure.md`
    - `docs/var-layout.md`
    - `docs/validation.md`
-   - one domain doc per canonical playbook
+     - one domain doc per canonical playbook
    - AWX operating model and bootstrap handoff docs adapted from the BIG-IP repo where the workflow still applies
 
 12. Add repository tooling and developer ergonomics to match the reference repo's standard.
    - Python packaging and lint/test targets for helper tools
-   - `make validate`
    - example inventory and AWX-safe execution patterns
    - `audit_mode` support across canonical playbooks
 

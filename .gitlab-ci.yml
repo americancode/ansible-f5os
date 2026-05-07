@@ -1,0 +1,54 @@
+image: $VALIDATION_IMAGE
+
+stages:
+  - validate
+  - drift
+
+variables:
+  VALIDATION_IMAGE: "python:3.12"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  ANSIBLE_LOCAL_TEMP: "$CI_PROJECT_DIR/.ansible/localtmp"
+  ANSIBLE_REMOTE_TEMP: "$CI_PROJECT_DIR/.ansible/tmp"
+  ANSIBLE_COLLECTIONS_PATH: "/opt/ansible/collections"
+
+cache:
+  paths:
+    - .cache/pip
+
+validate:
+  stage: validate
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  before_script:
+    - mkdir -p "$ANSIBLE_LOCAL_TEMP" "$ANSIBLE_REMOTE_TEMP"
+    - |
+      if ! command -v ansible-playbook >/dev/null 2>&1; then
+        python -m pip install --upgrade pip
+        python -m pip install ansible-core PyYAML
+      fi
+    - |
+      if ! ansible-doc -l 2>/dev/null | grep -q 'f5networks.f5os.f5os_system'; then
+        ansible-galaxy collection install f5networks.f5os -p /opt/ansible/collections
+      fi
+  script:
+    - make validate
+
+drift-check:
+  stage: drift
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$DRIFT_CHECK_ENABLED == "true"'
+  before_script:
+    - |
+      if ! python -c "import yaml" >/dev/null 2>&1; then
+        python -m pip install --upgrade pip
+        python -m pip install PyYAML
+      fi
+  script:
+    - python3 tools/drift-check.py > drift-report.txt || true
+  artifacts:
+    when: always
+    paths:
+      - drift-report.txt
+    expire_in: 30 days
