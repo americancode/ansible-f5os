@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tools.f5os_tools.validate.domains import validate_bootstrap, validate_network, validate_system
+from tools.f5os_tools.validate.domains import validate_bootstrap, validate_network, validate_qos, validate_system
 from tools.f5os_tools.validate.models import ValidationResult
 from tools.f5os_tools.validate.tree import REPO_ROOT
 
@@ -20,6 +20,7 @@ class Validator:
         validate_bootstrap(self.result)
         validate_system(self.result)
         validate_network(self.result)
+        validate_qos(self.result)
         self._print_summary()
         return 0 if self.result.ok else 1
 

@@ -1,8 +1,74 @@
 # Network delete tasks.
-# Placeholder delete surface for reverse-order network lifecycle handling once module mappings are implemented.
+# Runtime effect: removes F5OS network objects in reverse dependency order.
 ---
-- name: Placeholder network delete summary
-  ansible.builtin.debug:
-    msg:
-      - "Network delete runtime not implemented yet."
-      - "Delete collections are staged through prep and audit already."
+- name: Remove network FDB entries
+  f5os_fdb:
+    mac_address: "{{ item.mac_address }}"
+    vlan_id: "{{ item.vlan_id }}"
+    interface: "{{ item.interface }}"
+    tag_type: "{{ item.tag_type | default(omit) }}"
+    state: absent
+  loop: "{{ network_fdb_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default(item.mac_address) }}"
+
+- name: Remove network VLANs
+  f5os_vlan:
+    name: "{{ item.name | default(omit) }}"
+    vlan_id: "{{ item.vlan_id }}"
+    state: absent
+  loop: "{{ network_vlans_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default(item.vlan_id) }}"
+
+- name: Remove network LAGs
+  f5os_lag:
+    name: "{{ item.name }}"
+    trunk_vlans: "{{ item.trunk_vlans | default(omit) }}"
+    native_vlan: "{{ item.native_vlan | default(omit) }}"
+    config_members: "{{ item.config_members | default(omit) }}"
+    state: absent
+  loop: "{{ network_lags_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Remove network interface assignments
+  f5os_interface:
+    name: "{{ item.name }}"
+    trunk_vlans: "{{ item.trunk_vlans | default(omit) }}"
+    native_vlan: "{{ item.native_vlan | default(omit) }}"
+    state: absent
+  loop: "{{ network_interfaces_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Remove network LLDP configuration
+  f5os_lldp_config:
+    enabled: "{{ item.enabled | default(omit) }}"
+    system_name: "{{ item.system_name | default(omit) }}"
+    system_description: "{{ item.system_description | default(omit) }}"
+    tx_interval: "{{ item.tx_interval | default(omit) }}"
+    tx_hold: "{{ item.tx_hold | default(omit) }}"
+    reinitiate_delay: "{{ item.reinitiate_delay | default(omit) }}"
+    tx_delay: "{{ item.tx_delay | default(omit) }}"
+    max_neighbors_per_port: "{{ item.max_neighbors_per_port | default(omit) }}"
+    interfaces: "{{ item.interfaces | default(omit) }}"
+    state: absent
+  loop: "{{ network_lldp_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('lldp') }}"
+
+- name: Remove network STP configuration
+  f5os_stp_config:
+    mode: "{{ item.mode | default(omit) }}"
+    bridge_priority: "{{ item.bridge_priority | default(omit) }}"
+    forwarding_delay: "{{ item.forwarding_delay | default(omit) }}"
+    hello_time: "{{ item.hello_time | default(omit) }}"
+    hold_count: "{{ item.hold_count | default(omit) }}"
+    max_age: "{{ item.max_age | default(omit) }}"
+    interfaces: "{{ item.interfaces | default(omit) }}"
+    mstp_instances: "{{ item.mstp_instances | default(omit) }}"
+    state: absent
+  loop: "{{ network_stp_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('stp') }}"

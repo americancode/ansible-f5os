@@ -1,0 +1,27 @@
+# QoS delete tasks.
+# Runtime effect: removes F5OS QoS objects in reverse dependency order.
+---
+- name: Remove QoS meter groups
+  f5os_qos_meter_group:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ qos_meter_groups_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Remove QoS mappings
+  f5os_qos_mapping:
+    mapping_type: "{{ item.mapping_type }}"
+    traffic_priority: "{{ item.traffic_priority }}"
+    state: absent
+  loop: "{{ qos_mappings_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default(item.mapping_type ~ ':' ~ item.traffic_priority) }}"
+
+- name: Remove QoS traffic priorities
+  f5os_qos_traffic_priority:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ qos_traffic_priorities_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"

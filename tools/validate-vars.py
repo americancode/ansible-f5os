@@ -10,4 +10,4 @@ from tools.f5os_tools.cli import main
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(["validate-vars"]))
+    raise SystemExit(main(["validate-vars", *sys.argv[1:]]))

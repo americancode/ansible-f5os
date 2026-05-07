@@ -1,0 +1,23 @@
+# QoS entrypoint.
+# Loads `vars/common.yml` and runs QoS prep before applying canonical QoS runtime tasks.
+---
+- name: Configure F5OS QoS objects
+  hosts: all
+  connection: httpapi
+  gather_facts: false
+  collections:
+    - f5networks.f5os
+
+  vars:
+    repo_root: "{{ playbook_dir }}/.."
+
+  vars_files:
+    - "{{ repo_root }}/vars/common.yml"
+
+  pre_tasks:
+    - name: Prepare QoS inputs
+      ansible.builtin.import_tasks: qos/prep.yml
+
+  tasks:
+    - name: Manage QoS objects
+      ansible.builtin.import_tasks: qos/tasks/manage.yml

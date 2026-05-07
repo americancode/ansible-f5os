@@ -1,0 +1,32 @@
+# QoS apply tasks.
+# Runtime effect: applies F5OS traffic priorities, mappings, and meter groups in dependency order.
+---
+- name: Apply QoS traffic priorities
+  f5os_qos_traffic_priority:
+    name: "{{ item.name }}"
+    default_qos: "{{ item.default_qos | default(omit) }}"
+    qos_status: "{{ item.qos_status | default(omit) }}"
+    state: present
+  loop: "{{ qos_traffic_priorities_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Apply QoS mappings
+  f5os_qos_mapping:
+    mapping_type: "{{ item.mapping_type }}"
+    traffic_priority: "{{ item.traffic_priority }}"
+    mapping_values: "{{ item.mapping_values | default(omit) }}"
+    state: present
+  loop: "{{ qos_mappings_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default(item.mapping_type ~ ':' ~ item.traffic_priority) }}"
+
+- name: Apply QoS meter groups
+  f5os_qos_meter_group:
+    name: "{{ item.name }}"
+    interfaces: "{{ item.interfaces | default(omit) }}"
+    meters: "{{ item.meters | default(omit) }}"
+    state: present
+  loop: "{{ qos_meter_groups_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"

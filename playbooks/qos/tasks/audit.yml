@@ -1,0 +1,34 @@
+# QoS audit tasks.
+# Runtime effect: prints planned QoS delete/apply collections before any F5OS module calls.
+---
+- name: Announce QoS audit mode
+  ansible.builtin.debug:
+    msg:
+      - "AUDIT MODE qos for {{ inventory_hostname }} -> {{ provider.server }}"
+      - "No F5OS changes will be made."
+
+- name: Print QoS delete collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "DELETE"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "qos_meter_groups_delete", items: "{{ qos_meter_groups_delete | default([]) }}" }
+    - { name: "qos_mappings_delete", items: "{{ qos_mappings_delete | default([]) }}" }
+    - { name: "qos_traffic_priorities_delete", items: "{{ qos_traffic_priorities_delete | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Print QoS apply collections
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/tasks/audit-collection.yml"
+  vars:
+    audit_phase: "APPLY"
+    audit_collection_name: "{{ item.name }}"
+    audit_collection_items: "{{ item.items }}"
+  loop:
+    - { name: "qos_traffic_priorities_present", items: "{{ qos_traffic_priorities_present | default([]) }}" }
+    - { name: "qos_mappings_present", items: "{{ qos_mappings_present | default([]) }}" }
+    - { name: "qos_meter_groups_present", items: "{{ qos_meter_groups_present | default([]) }}" }
+  loop_control:
+    label: "{{ item.name }}"

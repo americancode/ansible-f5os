@@ -5,6 +5,7 @@ from filter_plugins.f5os_filters.fragments import (
     classify_fragment_operations,
     discover_yaml_fragments,
 )
+from filter_plugins.f5os_filters.settings import load_settings_hierarchy
 
 
 class FilterModule:
@@ -15,4 +16,5 @@ class FilterModule:
             "discover_yaml_fragments": discover_yaml_fragments,
             "aggregate_settings_fragments": aggregate_settings_fragments,
             "classify_fragment_operations": classify_fragment_operations,
+            "load_settings_hierarchy": load_settings_hierarchy,
         }

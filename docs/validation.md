@@ -7,13 +7,10 @@ Current local entrypoints:
 - `make validate`
 - `make validate-vars`
 - `make validate-ansible`
-- `make drift-check`
 
 Direct script entrypoints still exist:
 
 - `python3 tools/validate-vars.py`
-- `python3 tools/drift-check.py`
-- `python3 tools/import-from-f5os.py`
 
 Current `make validate` behavior:
 
@@ -21,6 +18,7 @@ Current `make validate` behavior:
   - `bootstrap`
   - `system`
   - `network`
+  - `qos`
 - runs `ansible-playbook --syntax-check` for:
   - `playbooks/bootstrap.yml`
   - `playbooks/system.yml`
@@ -29,7 +27,6 @@ Current `make validate` behavior:
 Current GitLab CI behavior:
 
 - `validate` stage installs `ansible-core`, `PyYAML`, and the `f5networks.f5os` collection when needed, then runs `make validate`
-- `drift-check` stage runs the current placeholder drift tool and stores `drift-report.txt` as an artifact
 
 Air-gapped validation image:
 
@@ -42,4 +39,3 @@ Air-gapped validation image:
 Known gap:
 
 - `validate-vars` is now implemented for the current domains, but it is still not full parity with the reference repo's deeper tree inheritance and field-model validation
-- `drift-check` and `import-from-f5os` are still scaffold-only

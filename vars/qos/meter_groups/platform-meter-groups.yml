@@ -1,0 +1,15 @@
+---
+# QoS meter group examples for associating traffic priorities and weights to interfaces.
+# These objects reference traffic priorities in `vars/qos/traffic_priorities/` and platform interfaces or LAGs.
+# Supported fields: `name`, `interfaces`, `meters`, and `state`.
+meter_groups:
+  - name: edge-meter-group
+    interfaces:
+      - "1.0"
+      - "lag10"
+    meters:
+      - name: tp-voice
+        weight: 3
+      - name: tp-control
+        weight: 2
+    state: present

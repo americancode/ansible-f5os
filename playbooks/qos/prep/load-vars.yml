@@ -1,0 +1,38 @@
+# QoS variable loader.
+# Builds aggregated raw collections from the QoS var tree and deletion tree.
+---
+- name: Load QoS traffic priority fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "qos traffic priorities"
+    source_root: "{{ repo_root }}/vars/qos/traffic_priorities"
+    deletion_root: "{{ repo_root }}/vars/qos/deletions/traffic_priorities"
+    fragment_var_name: "qos_traffic_priorities_fragment"
+    aggregate_var: "qos_traffic_priorities_aggregate"
+    deletion_aggregate_var: "qos_traffic_priorities_delete_aggregate"
+    collection_key: "traffic_priorities"
+    defaults_key: "traffic_priority_defaults"
+
+- name: Load QoS mapping fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "qos mappings"
+    source_root: "{{ repo_root }}/vars/qos/mappings"
+    deletion_root: "{{ repo_root }}/vars/qos/deletions/mappings"
+    fragment_var_name: "qos_mappings_fragment"
+    aggregate_var: "qos_mappings_aggregate"
+    deletion_aggregate_var: "qos_mappings_delete_aggregate"
+    collection_key: "qos_mappings"
+    defaults_key: "qos_mapping_defaults"
+
+- name: Load QoS meter group fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "qos meter groups"
+    source_root: "{{ repo_root }}/vars/qos/meter_groups"
+    deletion_root: "{{ repo_root }}/vars/qos/deletions/meter_groups"
+    fragment_var_name: "qos_meter_groups_fragment"
+    aggregate_var: "qos_meter_groups_aggregate"
+    deletion_aggregate_var: "qos_meter_groups_delete_aggregate"
+    collection_key: "meter_groups"
+    defaults_key: "meter_group_defaults"

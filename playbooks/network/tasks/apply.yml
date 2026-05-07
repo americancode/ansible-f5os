@@ -1,11 +1,80 @@
 # Network apply tasks.
-# Placeholder runtime surface for F5OS network configuration objects.
+# Runtime effect: applies F5OS interface, lag, vlan, fdb, LLDP, and STP objects using canonical ordering.
 ---
-- name: Placeholder network apply summary
-  ansible.builtin.debug:
-    msg:
-      - "Network runtime not implemented yet."
-      - "Interfaces: {{ network_interfaces_present | length }}"
-      - "LAGs: {{ network_lags_present | length }}"
-      - "VLANs: {{ network_vlans_present | length }}"
-      - "FDB entries: {{ network_fdb_present | length }}"
+- name: Apply network VLANs
+  f5os_vlan:
+    name: "{{ item.name }}"
+    vlan_id: "{{ item.vlan_id }}"
+    state: present
+  loop: "{{ network_vlans_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Apply network interfaces
+  f5os_interface:
+    name: "{{ item.name }}"
+    description: "{{ item.description | default(omit) }}"
+    enabled: "{{ item.enabled | default(omit) }}"
+    forward_error_correction: "{{ item.forward_error_correction | default(omit) }}"
+    native_vlan: "{{ item.native_vlan | default(omit) }}"
+    trunk_vlans: "{{ item.trunk_vlans | default(omit) }}"
+    state: present
+  loop: "{{ network_interfaces_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Apply network LAGs
+  f5os_lag:
+    name: "{{ item.name }}"
+    lag_type: "{{ item.lag_type }}"
+    mode: "{{ item.mode | default(omit) }}"
+    interval: "{{ item.interval | default(omit) }}"
+    native_vlan: "{{ item.native_vlan | default(omit) }}"
+    trunk_vlans: "{{ item.trunk_vlans | default(omit) }}"
+    config_members: "{{ item.config_members | default(omit) }}"
+    state: present
+  loop: "{{ network_lags_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Apply network FDB entries
+  f5os_fdb:
+    mac_address: "{{ item.mac_address }}"
+    vlan_id: "{{ item.vlan_id }}"
+    interface: "{{ item.interface }}"
+    tag_type: "{{ item.tag_type | default(omit) }}"
+    state: present
+  loop: "{{ network_fdb_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default(item.mac_address) }}"
+
+- name: Apply network LLDP configuration
+  f5os_lldp_config:
+    enabled: "{{ item.enabled | default(omit) }}"
+    system_name: "{{ item.system_name | default(omit) }}"
+    system_description: "{{ item.system_description | default(omit) }}"
+    tx_interval: "{{ item.tx_interval | default(omit) }}"
+    tx_hold: "{{ item.tx_hold | default(omit) }}"
+    reinitiate_delay: "{{ item.reinitiate_delay | default(omit) }}"
+    tx_delay: "{{ item.tx_delay | default(omit) }}"
+    max_neighbors_per_port: "{{ item.max_neighbors_per_port | default(omit) }}"
+    interfaces: "{{ item.interfaces | default(omit) }}"
+    state: present
+  loop: "{{ network_lldp_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('lldp') }}"
+
+- name: Apply network STP configuration
+  f5os_stp_config:
+    mode: "{{ item.mode | default(omit) }}"
+    bridge_priority: "{{ item.bridge_priority | default(omit) }}"
+    forwarding_delay: "{{ item.forwarding_delay | default(omit) }}"
+    hello_time: "{{ item.hello_time | default(omit) }}"
+    hold_count: "{{ item.hold_count | default(omit) }}"
+    max_age: "{{ item.max_age | default(omit) }}"
+    interfaces: "{{ item.interfaces | default(omit) }}"
+    mstp_instances: "{{ item.mstp_instances | default(omit) }}"
+    state: present
+  loop: "{{ network_stp_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('stp') }}"

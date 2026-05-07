@@ -1,10 +1,20 @@
 ---
 # STP configuration examples for loop prevention policy.
 # These objects are consumed by the network playbook.
-# Supported fields: `name`, `enabled`, `mode`, `priority`, and `state`.
+# Supported fields: `name`, `mode`, `bridge_priority`, `forwarding_delay`,
+# `hello_time`, `hold_count`, `max_age`, `interfaces`, `mstp_instances`, and `state`.
 stp_configs:
   - name: default-stp
-    enabled: true
     mode: rstp
-    priority: 32768
+    bridge_priority: 32768
+    forwarding_delay: 15
+    hello_time: 2
+    hold_count: 6
+    max_age: 20
+    interfaces:
+      name: lag10
+      cost: 1
+      port_priority: 128
+      edge_port: EDGE_AUTO
+      link_type: P2P
     state: present

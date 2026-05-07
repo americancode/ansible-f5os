@@ -1,0 +1,8 @@
+# QoS prep orchestrator.
+# Produces canonical runtime sets for traffic priorities, mappings, and meter groups.
+---
+- name: Load QoS var fragments
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/qos/prep/load-vars.yml"
+
+- name: Build QoS runtime facts
+  ansible.builtin.import_tasks: "{{ playbook_dir }}/qos/prep/build-runtime.yml"

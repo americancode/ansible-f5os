@@ -33,8 +33,6 @@ These are binding. A feature is not complete just because a playbook exists.
 
 - For every normal feature change, all repo Python tooling must be considered part of the implementation surface:
   - `tools/validate-vars.py`
-  - `tools/drift-check.py`
-  - `tools/import-from-f5os.py`
   - supporting filter or helper modules such as `filter_plugins/f5os_var_filters.py` and split support packages under `filter_plugins/f5os_filters/`
 
 - Do not mark a roadmap item complete unless the feature is operationally complete across the repo model:
@@ -43,7 +41,6 @@ These are binding. A feature is not complete just because a playbook exists.
   - `tasks/delete.yml` supports reverse-order deletion behavior unless the roadmap documents an exception
   - `tasks/manage.yml` preserves repo-standard ordering and config save behavior
   - `tools/validate-vars.py` validates the tree and its references
-  - `tools/drift-check.py` and `tools/import-from-f5os.py` are updated when the repo expects GitOps lifecycle coverage for that object family
   - docs and example var files describe the same field model that the runtime tasks actually use
 
 - Preserve repo-wide contracts when adding a new domain or refactoring an existing one:
@@ -117,8 +114,6 @@ This is binding for future modifications:
 ### Python Tooling
 
 - [ ] `tools/validate-vars.py` understands the new tree
-- [ ] `tools/drift-check.py` explicitly documents whether the new object family is unsupported, `identity-only`, `basic field drift`, or `model-aware`
-- [ ] `tools/import-from-f5os.py` explicitly documents whether import support exists and at what fidelity
 
 ### Docs
 

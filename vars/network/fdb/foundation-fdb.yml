@@ -1,10 +1,10 @@
 ---
 # FDB entry examples for static forwarding entries.
-# These objects are consumed by the network playbook and may reference VLAN names.
-# Supported fields: `name`, `mac_address`, `vlan`, `interface`, and `state`.
+# These objects are consumed by the network playbook and may reference VLAN IDs and interface or LAG names.
+# Supported fields: `name`, `mac_address`, `vlan_id`, `interface`, `tag_type`, and `state`.
 fdb_entries:
   - name: app-firewall
     mac_address: 00:11:22:33:44:55
-    vlan: tenant-frontend
+    vlan_id: 110
     interface: lag10
     state: present

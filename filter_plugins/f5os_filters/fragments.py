@@ -1,9 +1,12 @@
-"""Helpers for recursive fragment discovery and lightweight runtime shaping."""
+"""Helpers for recursive fragment discovery and runtime shaping."""
 
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
+
+from .common import deep_merge_dicts
+from .settings import load_settings_hierarchy
 
 
 def discover_yaml_fragments(root: str) -> list[str]:
@@ -27,25 +30,27 @@ def aggregate_settings_fragments(
     source_root: str,
     fragment_var_name: str,
     collection_key: str,
-    defaults_key: str,
+    defaults_key: str | None,
     deletion_mode: bool = False,
 ) -> list[dict[str, Any]]:
-    """Flatten included fragment payloads into one runtime collection.
-
-    This placeholder implementation keeps the contract simple for initial
-    scaffolding: it merges top-level collection lists and applies defaults only
-    when they already exist inline in a fragment payload.
-    """
+    """Flatten included fragment payloads and merge them with hierarchical defaults."""
     aggregated: list[dict[str, Any]] = []
     for result in include_results or []:
-      payload = (result.get("ansible_facts") or {}).get(fragment_var_name) or {}
-      defaults = payload.get(defaults_key, {}) or {}
-      for item in payload.get(collection_key, []) or []:
-          merged = dict(defaults)
-          merged.update(item or {})
-          if deletion_mode and "state" not in merged:
-              merged["state"] = "absent"
-          aggregated.append(merged)
+        if not isinstance(result, dict):
+            continue
+        source_file = result.get("item")
+        payload = (result.get("ansible_facts") or {}).get(fragment_var_name) or {}
+        fragment_items = payload.get(collection_key) or []
+        settings_payload = load_settings_hierarchy(source_file, source_root)
+        directory_defaults = settings_payload.get(defaults_key, {}) if defaults_key else {}
+
+        for item in fragment_items:
+            if not isinstance(item, dict):
+                continue
+            merged = deep_merge_dicts(directory_defaults, item)
+            if deletion_mode:
+                merged = deep_merge_dicts(merged, {"state": "absent"})
+            aggregated.append(merged)
     return aggregated
 
 

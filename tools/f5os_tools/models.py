@@ -1,4 +1,6 @@
-"""Shared tooling data models for future validator, drift, and import work."""
+"""Shared tooling data models for validator support."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 

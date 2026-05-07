@@ -1,0 +1,12 @@
+---
+# QoS traffic priority examples for F5OS traffic classification.
+# These objects are referenced by mappings and meter groups in the same domain.
+# Supported fields: `name`, `default_qos`, `qos_status`, and `state`.
+traffic_priorities:
+  - name: tp-voice
+    default_qos: dscp
+    qos_status: dscp
+    state: present
+  - name: tp-control
+    qos_status: 802.1p
+    state: present

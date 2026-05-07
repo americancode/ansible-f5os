@@ -1,12 +1,16 @@
 ---
 # LAG examples for aggregated uplink configuration.
 # These objects may reference interface names from `vars/network/interfaces/`.
-# Supported fields: `name`, `members`, `lacp_mode`, `description`, and `state`.
+# Supported fields: `name`, `lag_type`, `mode`, `interval`, `native_vlan`,
+# `trunk_vlans`, `config_members`, and `state`.
 lags:
   - name: lag10
-    members:
+    lag_type: lacp
+    mode: active
+    interval: slow
+    trunk_vlans:
+      - 110
+    config_members:
       - 1.0
       - 1.1
-    lacp_mode: active
-    description: uplink-bundle
     state: present

@@ -8,3 +8,4 @@ Start here for the repo structure and implementation status.
 - [bootstrap.md](bootstrap.md)
 - [system.md](system.md)
 - [network.md](network.md)
+- [qos.md](qos.md)

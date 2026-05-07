@@ -1,0 +1,29 @@
+# QoS runtime builder.
+# Shapes aggregated QoS fragments into final present/delete collections consumed by audit and runtime tasks.
+---
+- name: Classify QoS traffic priority operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "qos traffic priorities"
+    source_items: "{{ qos_traffic_priorities_aggregate | default([]) }}"
+    source_delete_items: "{{ qos_traffic_priorities_delete_aggregate | default([]) }}"
+    present_var: "qos_traffic_priorities_present"
+    delete_var: "qos_traffic_priorities_delete"
+
+- name: Classify QoS mapping operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "qos mappings"
+    source_items: "{{ qos_mappings_aggregate | default([]) }}"
+    source_delete_items: "{{ qos_mappings_delete_aggregate | default([]) }}"
+    present_var: "qos_mappings_present"
+    delete_var: "qos_mappings_delete"
+
+- name: Classify QoS meter group operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "qos meter groups"
+    source_items: "{{ qos_meter_groups_aggregate | default([]) }}"
+    source_delete_items: "{{ qos_meter_groups_delete_aggregate | default([]) }}"
+    present_var: "qos_meter_groups_present"
+    delete_var: "qos_meter_groups_delete"

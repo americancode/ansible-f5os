@@ -1,0 +1,18 @@
+---
+# QoS mapping examples for mapping DSCP or 802.1p values to traffic priorities.
+# These objects reference traffic priorities in `vars/qos/traffic_priorities/`.
+# Supported fields: `name`, `mapping_type`, `traffic_priority`, `mapping_values`, and `state`.
+qos_mappings:
+  - name: dscp-voice
+    mapping_type: dscp
+    traffic_priority: tp-voice
+    mapping_values:
+      - "46"
+      - "48-49"
+    state: present
+  - name: dot1p-control
+    mapping_type: "802.1p"
+    traffic_priority: tp-control
+    mapping_values:
+      - "5"
+    state: present

@@ -1,17 +1,16 @@
 ---
 # Interface examples for platform port configuration.
 # These objects are consumed by the network playbook and may be referenced by LAG and VLAN definitions.
-# Supported fields: `name`, `enabled`, `speed`, `mtu`, `description`, and `state`.
+# Supported fields: `name`, `description`, `enabled`, `forward_error_correction`,
+# `native_vlan`, `trunk_vlans`, and `state`.
 interfaces:
   - name: 1.0
     enabled: true
-    speed: auto
-    mtu: 1500
     description: uplink-a
+    forward_error_correction: auto
     state: present
   - name: 1.1
     enabled: true
-    speed: auto
-    mtu: 1500
     description: uplink-b
+    forward_error_correction: auto
     state: present

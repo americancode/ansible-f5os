@@ -122,36 +122,38 @@ def validate_network(result: ValidationResult) -> None:
         require_keys(result, path, item, ["name"], _name(item))
         if "name" in item:
             interface_names.add(item["name"])
+        if "trunk_vlans" in item and not isinstance(item["trunk_vlans"], list):
+            result.add_error(path, "`trunk_vlans` must be a list", _name(item))
 
     lag_objects = collect_objects(VARS_ROOT / "network" / "lags", "lags", result)
     lag_names: set[str] = set()
     for path, item in lag_objects:
-        require_keys(result, path, item, ["name", "members"], _name(item))
+        require_keys(result, path, item, ["name", "lag_type", "config_members"], _name(item))
         if "name" in item:
             lag_names.add(item["name"])
-        members = item.get("members", [])
+        members = item.get("config_members", [])
         if not isinstance(members, list):
-            result.add_error(path, "`members` must be a list", _name(item))
+            result.add_error(path, "`config_members` must be a list", _name(item))
             continue
         for member in members:
             if member not in interface_names:
                 result.add_error(path, f"LAG member `{member}` is not defined under vars/network/interfaces", _name(item))
+        if "trunk_vlans" in item and not isinstance(item["trunk_vlans"], list):
+            result.add_error(path, "`trunk_vlans` must be a list", _name(item))
 
     vlan_objects = collect_objects(VARS_ROOT / "network" / "vlans", "vlans", result)
-    vlan_names: set[str] = set()
+    vlan_ids: set[int] = set()
     for path, item in vlan_objects:
-        require_keys(result, path, item, ["name", "vlan_id", "interfaces"], _name(item))
-        if "name" in item:
-            vlan_names.add(item["name"])
-        for attachment in item.get("interfaces", []) or []:
-            if attachment not in interface_names and attachment not in lag_names:
-                result.add_error(path, f"VLAN attachment `{attachment}` is not a known interface or LAG", _name(item))
+        require_keys(result, path, item, ["name", "vlan_id"], _name(item))
+        vlan_id = item.get("vlan_id")
+        if isinstance(vlan_id, int):
+            vlan_ids.add(vlan_id)
 
     fdb_objects = collect_objects(VARS_ROOT / "network" / "fdb", "fdb_entries", result)
     for path, item in fdb_objects:
-        require_keys(result, path, item, ["name", "mac_address", "vlan", "interface"], _name(item))
-        if item.get("vlan") and item["vlan"] not in vlan_names:
-            result.add_error(path, f"FDB vlan `{item['vlan']}` is not defined under vars/network/vlans", _name(item))
+        require_keys(result, path, item, ["name", "mac_address", "vlan_id", "interface"], _name(item))
+        if isinstance(item.get("vlan_id"), int) and item["vlan_id"] not in vlan_ids:
+            result.add_error(path, f"FDB vlan_id `{item['vlan_id']}` is not defined under vars/network/vlans", _name(item))
         if item.get("interface") and item["interface"] not in interface_names and item["interface"] not in lag_names:
             result.add_error(path, f"FDB interface `{item['interface']}` is not a known interface or LAG", _name(item))
 
@@ -159,6 +161,52 @@ def validate_network(result: ValidationResult) -> None:
         policy_objects = collect_objects(VARS_ROOT / "network" / subdir, collection_key, result)
         for path, item in policy_objects:
             require_keys(result, path, item, ["name"], _name(item))
+            if "interfaces" in item and not isinstance(item["interfaces"], dict):
+                result.add_error(path, "`interfaces` must be a dictionary", _name(item))
+
+
+def validate_qos(result: ValidationResult) -> None:
+    """Validate QoS var trees and cross-object references."""
+    traffic_priority_objects = collect_objects(
+        VARS_ROOT / "qos" / "traffic_priorities",
+        "traffic_priorities",
+        result,
+    )
+    traffic_priority_names: set[str] = set()
+    for path, item in traffic_priority_objects:
+        require_keys(result, path, item, ["name"], _name(item))
+        if "name" in item:
+            traffic_priority_names.add(item["name"])
+        if "default_qos" in item and item["default_qos"] not in {"802.1p", "dscp"}:
+            result.add_error(path, "`default_qos` must be `802.1p` or `dscp`", _name(item))
+        if "qos_status" in item and item["qos_status"] not in {"disable", "802.1p", "dscp"}:
+            result.add_error(path, "`qos_status` must be `disable`, `802.1p`, or `dscp`", _name(item))
+
+    mapping_objects = collect_objects(VARS_ROOT / "qos" / "mappings", "qos_mappings", result)
+    for path, item in mapping_objects:
+        require_keys(result, path, item, ["mapping_type", "traffic_priority"], _name(item))
+        if item.get("mapping_type") not in {"802.1p", "dscp"}:
+            result.add_error(path, "`mapping_type` must be `802.1p` or `dscp`", _name(item))
+        if item.get("traffic_priority") not in traffic_priority_names:
+            result.add_error(path, "mapping references an unknown traffic priority", _name(item))
+        if "mapping_values" in item and not isinstance(item["mapping_values"], list):
+            result.add_error(path, "`mapping_values` must be a list", _name(item))
+
+    meter_group_objects = collect_objects(VARS_ROOT / "qos" / "meter_groups", "meter_groups", result)
+    for path, item in meter_group_objects:
+        require_keys(result, path, item, ["name"], _name(item))
+        if "interfaces" in item and not isinstance(item["interfaces"], list):
+            result.add_error(path, "`interfaces` must be a list", _name(item))
+        if "meters" in item and not isinstance(item["meters"], list):
+            result.add_error(path, "`meters` must be a list", _name(item))
+            continue
+        for meter in item.get("meters", []) or []:
+            if not isinstance(meter, dict):
+                result.add_error(path, "`meters` entries must be mappings", _name(item))
+                continue
+            require_keys(result, path, meter, ["name", "weight"], _name(item))
+            if meter.get("name") not in traffic_priority_names:
+                result.add_error(path, f"meter references unknown traffic priority `{meter.get('name')}`", _name(item))
 
 
 def validate_deletion_trees(result: ValidationResult) -> None:

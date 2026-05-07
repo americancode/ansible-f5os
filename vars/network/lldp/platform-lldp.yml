@@ -1,10 +1,22 @@
 ---
 # LLDP configuration examples for neighbor discovery policy.
 # These objects are consumed by the network playbook.
-# Supported fields: `name`, `enabled`, `tx_interval`, `hold_multiplier`, and `state`.
+# Supported fields: `name`, `enabled`, `system_name`, `system_description`,
+# `tx_interval`, `tx_hold`, `reinitiate_delay`, `tx_delay`, `max_neighbors_per_port`,
+# `interfaces`, and `state`.
 lldp_configs:
   - name: default-lldp
     enabled: true
+    system_name: f5os-platform-a
+    system_description: Edge rack platform
     tx_interval: 30
-    hold_multiplier: 4
+    tx_hold: 4
+    reinitiate_delay: 2
+    tx_delay: 2
+    max_neighbors_per_port: 10
+    interfaces:
+      name: 1.0
+      enabled: true
+      tlv_advertisement_state: txrx
+      tlv_map: chassis-id, port-id, ttl, system-name
     state: present
