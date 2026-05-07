@@ -1,12 +1,12 @@
 ---
 # DNS server examples for system name resolution.
 # These objects are consumed by the system playbook and may be referenced by authentication workflows.
-# Supported fields: `name`, `servers`, `search`, and `state`.
+# Supported fields: `name`, `dns_servers`, `dns_domains`, and `state`.
 dns_servers:
   - name: primary-dns
-    servers:
+    dns_servers:
       - 192.0.2.53
       - 192.0.2.54
-    search:
+    dns_domains:
       - example.com
     state: present

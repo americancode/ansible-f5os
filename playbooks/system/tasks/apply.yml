@@ -1,11 +1,138 @@
 # System apply tasks.
-# Placeholder runtime surface for shared F5OS system configuration objects.
+# Runtime effect: applies shared F5OS system configuration objects across the canonical system domain.
 ---
-- name: Placeholder system apply summary
-  ansible.builtin.debug:
-    msg:
-      - "System runtime not implemented yet."
-      - "System settings: {{ system_settings_present | length }}"
-      - "DNS: {{ system_dns_present | length }}"
-      - "NTP: {{ system_ntp_present | length }}"
-      - "Users: {{ system_users_present | length }}"
+- name: Apply generic system settings
+  f5os_system:
+    hostname: "{{ item.hostname | default(omit) }}"
+    gui_advisory: "{{ item.gui_advisory | default(omit) }}"
+    httpd_ciphersuite: "{{ item.httpd_ciphersuite | default(omit) }}"
+    login_banner: "{{ item.login_banner | default(omit) }}"
+    motd: "{{ item.motd | default(omit) }}"
+    cli_timeout: "{{ item.cli_timeout | default(omit) }}"
+    sshd_idle_timeout: "{{ item.sshd_idle_timeout | default(omit) }}"
+    sshd_ciphers: "{{ item.sshd_ciphers | default(omit) }}"
+    sshd_kex_alg: "{{ item.sshd_kex_alg | default(omit) }}"
+    sshd_mac_alg: "{{ item.sshd_mac_alg | default(omit) }}"
+    sshd_hkey_alg: "{{ item.sshd_hkey_alg | default(omit) }}"
+    timezone: "{{ item.timezone | default(omit) }}"
+    token_lifetime: "{{ item.token_lifetime | default(omit) }}"
+    state: present
+  loop: "{{ system_settings_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('system-settings') }}"
+
+- name: Apply DNS settings
+  f5os_dns:
+    dns_servers: "{{ item.dns_servers }}"
+    dns_domains: "{{ item.dns_domains | default(omit) }}"
+    state: present
+  loop: "{{ system_dns_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('dns') }}"
+
+- name: Apply NTP servers
+  f5os_ntp_server:
+    server: "{{ item.server }}"
+    key_id: "{{ item.key_id | default(omit) }}"
+    prefer: "{{ item.prefer | default(omit) }}"
+    iburst: "{{ item.iburst | default(omit) }}"
+    ntp_service: "{{ item.ntp_service | default(omit) }}"
+    ntp_authentication: "{{ item.ntp_authentication | default(omit) }}"
+    state: present
+  loop: "{{ system_ntp_present | default([]) }}"
+  loop_control:
+    label: "{{ item.server }}"
+
+- name: Apply logging configuration fragments
+  f5os_logging:
+    include_hostname: "{{ item.include_hostname | default(omit) }}"
+    remote_forwarding: "{{ item.remote_forwarding | default(omit) }}"
+    servers: "{{ item.servers | default(omit) }}"
+    tls: "{{ item.tls | default(omit) }}"
+    ca_bundles: "{{ item.ca_bundles | default(omit) }}"
+    state: present
+  loop: "{{ system_logging_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('logging') }}"
+
+- name: Apply allowed IP objects
+  f5os_allowed_ips:
+    allowed: "{{ item.allowed }}"
+    state: present
+  loop: "{{ system_allowed_ips_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('allowed-ips') }}"
+
+- name: Apply auth settings
+  f5os_auth:
+    auth_order: "{{ item.auth_order | default(omit) }}"
+    password_policy: "{{ item.password_policy | default(omit) }}"
+    remote_roles: "{{ item.remote_roles | default(omit) }}"
+    state: present
+  loop: "{{ system_auth_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('auth-settings') }}"
+
+- name: Apply auth server groups
+  f5os_auth_server:
+    name: "{{ item.name }}"
+    provider_type: "{{ item.provider_type }}"
+    server: "{{ item.server | default([]) }}"
+    force_update: "{{ item.force_update | default(omit) }}"
+    state: present
+  loop: "{{ system_auth_servers_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Apply system users
+  f5os_user:
+    username: "{{ item.username }}"
+    role: "{{ item.role }}"
+    expiry_status: "{{ item.expiry_status | default(omit) }}"
+    state: present
+  loop: "{{ system_users_present | default([]) }}"
+  loop_control:
+    label: "{{ item.username }}"
+
+- name: Apply system user password changes
+  f5os_user_password_change:
+    user_name: "{{ item.user_name }}"
+    old_password: "{{ item.old_password }}"
+    new_password: "{{ item.new_password }}"
+  loop: "{{ system_user_password_changes_present | default([]) }}"
+  loop_control:
+    label: "{{ item.user_name }}"
+
+- name: Apply system TLS cert/key objects
+  f5os_tls_cert_key:
+    name: "{{ item.name }}"
+    email: "{{ item.email | default(omit) }}"
+    city: "{{ item.city | default(omit) }}"
+    province: "{{ item.province | default(omit) }}"
+    country: "{{ item.country | default(omit) }}"
+    organization: "{{ item.organization | default(omit) }}"
+    unit: "{{ item.unit | default(omit) }}"
+    version: "{{ item.version | default(omit) }}"
+    days_valid: "{{ item.days_valid | default(omit) }}"
+    key_type: "{{ item.key_type | default(omit) }}"
+    key_size: "{{ item.key_size | default(omit) }}"
+    key_curve: "{{ item.key_curve | default(omit) }}"
+    key_passphrase: "{{ item.key_passphrase | default(omit) }}"
+    confirm_key_passphrase: "{{ item.confirm_key_passphrase | default(omit) }}"
+    store_tls: "{{ item.store_tls | default(omit) }}"
+    subject_alternative_name: "{{ item.subject_alternative_name | default(omit) }}"
+    state: present
+  loop: "{{ system_tls_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Apply SNMP configuration fragments
+  f5os_snmp:
+    snmp_mib: "{{ item.snmp_mib | default(omit) }}"
+    snmp_community: "{{ item.snmp_community | default(omit) }}"
+    snmp_target: "{{ item.snmp_target | default(omit) }}"
+    snmp_user: "{{ item.snmp_user | default(omit) }}"
+    state: present
+  loop: "{{ system_snmp_present | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('snmp') }}"

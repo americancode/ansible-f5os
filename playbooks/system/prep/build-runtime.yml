@@ -73,6 +73,15 @@
     present_var: "system_users_present"
     delete_var: "system_users_delete"
 
+- name: Classify system user password change operations
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
+  vars:
+    classification_label: "system user password changes"
+    source_items: "{{ system_user_password_changes_aggregate | default([]) }}"
+    source_delete_items: "{{ system_user_password_changes_delete_aggregate | default([]) }}"
+    present_var: "system_user_password_changes_present"
+    delete_var: "system_user_password_changes_delete"
+
 - name: Classify system TLS operations
   ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/classify-operations.yml"
   vars:

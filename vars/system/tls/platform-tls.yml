@@ -1,10 +1,21 @@
 ---
 # TLS cert/key examples for system services.
 # These objects are consumed by the system playbook.
-# Supported fields: `name`, `certificate`, `private_key`, `passphrase`, and `state`.
+# Supported fields: `name`, `email`, `city`, `province`, `country`, `organization`, `unit`,
+# `version`, `days_valid`, `key_type`, `key_size`, `key_curve`, `key_passphrase`,
+# `confirm_key_passphrase`, `store_tls`, `subject_alternative_name`, and `state`.
 tls_cert_keys:
   - name: management-ui
-    certificate: /path/to/cert.pem
-    private_key: /path/to/key.pem
-    passphrase: ""
+    email: noc@example.com
+    city: Raleigh
+    province: North Carolina
+    country: US
+    organization: ExampleCorp
+    unit: Platform
+    version: 3
+    days_valid: 365
+    key_type: rsa
+    key_size: 2048
+    store_tls: true
+    subject_alternative_name: DNS:f5os-platform-a.example.com
     state: present

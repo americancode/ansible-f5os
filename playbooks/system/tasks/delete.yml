@@ -1,8 +1,116 @@
 # System delete tasks.
-# Placeholder delete surface for reverse-order lifecycle handling once module mappings are implemented.
+# Runtime effect: removes system object families in reverse-ish dependency order. Password changes are intentionally non-deletable.
 ---
-- name: Placeholder system delete summary
-  ansible.builtin.debug:
-    msg:
-      - "System delete runtime not implemented yet."
-      - "Delete collections are staged through prep and audit already."
+- name: Reject user password change deletions
+  ansible.builtin.assert:
+    that:
+      - (system_user_password_changes_delete | default([]) | length) == 0
+    fail_msg: >-
+      `f5os_user_password_change` is a one-way operational action and does not
+      support `state: absent`. Remove any deletion fragments for user password changes.
+
+- name: Remove system TLS cert/key objects
+  f5os_tls_cert_key:
+    name: "{{ item.name }}"
+    state: absent
+  loop: "{{ system_tls_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Remove system users
+  f5os_user:
+    username: "{{ item.username }}"
+    role: "{{ item.role }}"
+    expiry_status: "{{ item.expiry_status | default(omit) }}"
+    state: absent
+  loop: "{{ system_users_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.username }}"
+
+- name: Remove system auth server groups
+  f5os_auth_server:
+    name: "{{ item.name }}"
+    provider_type: "{{ item.provider_type }}"
+    server: "{{ item.server | default([]) }}"
+    state: absent
+  loop: "{{ system_auth_servers_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Remove system auth settings
+  f5os_auth:
+    auth_order: "{{ item.auth_order | default(omit) }}"
+    password_policy: "{{ item.password_policy | default(omit) }}"
+    remote_roles: "{{ item.remote_roles | default(omit) }}"
+    state: absent
+  loop: "{{ system_auth_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('auth-settings') }}"
+
+- name: Remove allowed IP objects
+  f5os_allowed_ips:
+    allowed: "{{ item.allowed }}"
+    state: absent
+  loop: "{{ system_allowed_ips_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('allowed-ips') }}"
+
+- name: Remove logging configuration fragments
+  f5os_logging:
+    include_hostname: "{{ item.include_hostname | default(omit) }}"
+    remote_forwarding: "{{ item.remote_forwarding | default(omit) }}"
+    servers: "{{ item.servers | default(omit) }}"
+    tls: "{{ item.tls | default(omit) }}"
+    ca_bundles: "{{ item.ca_bundles | default(omit) }}"
+    state: absent
+  loop: "{{ system_logging_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('logging') }}"
+
+- name: Remove NTP servers
+  f5os_ntp_server:
+    server: "{{ item.server }}"
+    state: absent
+  loop: "{{ system_ntp_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.server }}"
+
+- name: Remove DNS settings
+  f5os_dns:
+    dns_servers: "{{ item.dns_servers }}"
+    dns_domains: "{{ item.dns_domains | default(omit) }}"
+    state: absent
+  loop: "{{ system_dns_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('dns') }}"
+
+- name: Remove generic system settings
+  f5os_system:
+    hostname: "{{ item.hostname | default(omit) }}"
+    gui_advisory: "{{ item.gui_advisory | default(omit) }}"
+    httpd_ciphersuite: "{{ item.httpd_ciphersuite | default(omit) }}"
+    login_banner: "{{ item.login_banner | default(omit) }}"
+    motd: "{{ item.motd | default(omit) }}"
+    cli_timeout: "{{ item.cli_timeout | default(omit) }}"
+    sshd_idle_timeout: "{{ item.sshd_idle_timeout | default(omit) }}"
+    sshd_ciphers: "{{ item.sshd_ciphers | default(omit) }}"
+    sshd_kex_alg: "{{ item.sshd_kex_alg | default(omit) }}"
+    sshd_mac_alg: "{{ item.sshd_mac_alg | default(omit) }}"
+    sshd_hkey_alg: "{{ item.sshd_hkey_alg | default(omit) }}"
+    timezone: "{{ item.timezone | default(omit) }}"
+    token_lifetime: "{{ item.token_lifetime | default(omit) }}"
+    state: absent
+  loop: "{{ system_settings_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('system-settings') }}"
+
+- name: Remove SNMP configuration fragments
+  f5os_snmp:
+    snmp_mib: "{{ item.snmp_mib | default(omit) }}"
+    snmp_community: "{{ item.snmp_community | default(omit) }}"
+    snmp_target: "{{ item.snmp_target | default(omit) }}"
+    snmp_user: "{{ item.snmp_user | default(omit) }}"
+    state: absent
+  loop: "{{ system_snmp_delete | default([]) }}"
+  loop_control:
+    label: "{{ item.name | default('snmp') }}"

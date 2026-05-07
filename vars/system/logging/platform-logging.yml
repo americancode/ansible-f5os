@@ -1,12 +1,17 @@
 ---
 # Logging profile examples for remote log forwarding and local logging policy.
 # These objects are consumed by the system playbook.
-# Supported fields: `name`, `remote_servers`, `facility`, `severity`, and `state`.
+# Supported fields: `name`, `include_hostname`, `servers`, `remote_forwarding`, `tls`, `ca_bundles`, and `state`.
 logging_profiles:
   - name: remote-syslog
-    remote_servers:
-      - host: 192.0.2.151
+    include_hostname: true
+    servers:
+      - address: 192.0.2.151
+        protocol: udp
         port: 514
-    facility: local0
-    severity: informational
+        logs:
+          - facility: local0
+            severity: informational
+          - facility: authpriv
+            severity: notice
     state: present

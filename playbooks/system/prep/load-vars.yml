@@ -97,6 +97,18 @@
     collection_key: "users"
     defaults_key: "user_defaults"
 
+- name: Load system user password change fragments
+  ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
+  vars:
+    fragment_label: "system user password changes"
+    source_root: "{{ repo_root }}/vars/system/user_password_changes"
+    deletion_root: "{{ repo_root }}/vars/system/deletions/user_password_changes"
+    fragment_var_name: "system_user_password_changes_fragment"
+    aggregate_var: "system_user_password_changes_aggregate"
+    deletion_aggregate_var: "system_user_password_changes_delete_aggregate"
+    collection_key: "user_password_changes"
+    defaults_key: "user_password_change_defaults"
+
 - name: Load system TLS fragments
   ansible.builtin.include_tasks: "{{ playbook_dir }}/shared/prep/load-fragment-tree.yml"
   vars:

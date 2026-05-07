@@ -1,10 +1,17 @@
 ---
 # Allowed IP examples for management-plane access restrictions.
 # These objects are consumed by the system playbook and may interact with remote administration workflows.
-# Supported fields: `name`, `addresses`, `description`, and `state`.
+# Supported fields: `name`, `allowed`, and `state`.
 allowed_ip_sets:
   - name: admin-sources
-    addresses:
-      - 198.51.100.0/24
-    description: trusted admin subnet
+    allowed:
+      - name: admins
+        ipv4:
+          address: 198.51.100.0
+          prefix: 24
+      - name: snmp
+        ipv4:
+          address: 198.51.100.10
+          prefix: 32
+          port: 161
     state: present

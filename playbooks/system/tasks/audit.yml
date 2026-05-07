@@ -22,6 +22,7 @@
     - { name: "system_auth_delete", items: "{{ system_auth_delete | default([]) }}" }
     - { name: "system_auth_servers_delete", items: "{{ system_auth_servers_delete | default([]) }}" }
     - { name: "system_users_delete", items: "{{ system_users_delete | default([]) }}" }
+    - { name: "system_user_password_changes_delete", items: "{{ system_user_password_changes_delete | default([]) }}" }
     - { name: "system_tls_delete", items: "{{ system_tls_delete | default([]) }}" }
     - { name: "system_snmp_delete", items: "{{ system_snmp_delete | default([]) }}" }
   loop_control:
@@ -42,6 +43,7 @@
     - { name: "system_auth_present", items: "{{ system_auth_present | default([]) }}" }
     - { name: "system_auth_servers_present", items: "{{ system_auth_servers_present | default([]) }}" }
     - { name: "system_users_present", items: "{{ system_users_present | default([]) }}" }
+    - { name: "system_user_password_changes_present", items: "{{ system_user_password_changes_present | default([]) }}" }
     - { name: "system_tls_present", items: "{{ system_tls_present | default([]) }}" }
     - { name: "system_snmp_present", items: "{{ system_snmp_present | default([]) }}" }
   loop_control:

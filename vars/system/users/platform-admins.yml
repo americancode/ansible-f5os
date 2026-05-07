@@ -1,10 +1,9 @@
 ---
 # User examples for local platform administrators.
 # These objects are consumed by the system playbook.
-# Supported fields: `name`, `password`, `role`, `shell`, and `state`.
+# Supported fields: `username`, `role`, `expiry_status`, and `state`.
 users:
-  - name: platformadmin
-    password: CHANGEME-PASSWORD
+  - username: platformadmin
     role: admin
-    shell: bash
+    expiry_status: enabled
     state: present

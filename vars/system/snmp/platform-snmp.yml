@@ -1,12 +1,21 @@
 ---
 # SNMP configuration examples for monitoring integration.
 # These objects are consumed by the system playbook.
-# Supported fields: `name`, `contact`, `location`, `communities`, and `state`.
+# Supported fields: `name`, `snmp_mib`, `snmp_community`, `snmp_target`, `snmp_user`, and `state`.
 snmp_configs:
   - name: default-snmp
-    contact: noc@example.com
-    location: primary-datacenter
-    communities:
+    snmp_mib:
+      syscontact: noc@example.com
+      syslocation: primary-datacenter
+      sysname: f5os-platform-a
+    snmp_community:
       - name: public-readonly
-        access: ro
+        security_model:
+          - v2c
+    snmp_target:
+      - name: noc-trap-target
+        security_model: v2c
+        ipv4_address: 192.0.2.210
+        port: 162
+        community: public-readonly
     state: present

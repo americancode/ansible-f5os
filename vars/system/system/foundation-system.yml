@@ -1,11 +1,18 @@
 ---
 # System setting examples for shared appliance identity and baseline behavior.
 # These objects are referenced only by the system playbook.
-# Supported fields: `name`, `hostname`, `contact`, `location`, `timezone`, and `state`.
+# Supported fields: `name`, `hostname`, `timezone`, `motd`, `login_banner`, `cli_timeout`,
+# `sshd_idle_timeout`, `gui_advisory`, `sshd_ciphers`, `sshd_kex_alg`, `sshd_mac_alg`,
+# `sshd_hkey_alg`, `httpd_ciphersuite`, `token_lifetime`, and `state`.
 systems:
   - name: platform-system
     hostname: f5os-platform-a.example.com
-    contact: network-team@example.com
-    location: primary-datacenter
     timezone: UTC
+    motd: Authorized users only.
+    login_banner: Platform access is monitored.
+    cli_timeout: 1800
+    sshd_idle_timeout: 900
+    gui_advisory:
+      color: orange
+      text: Production
     state: present

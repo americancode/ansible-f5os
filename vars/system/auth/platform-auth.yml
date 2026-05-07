@@ -1,10 +1,23 @@
 ---
 # Auth configuration examples for local and remote authentication behavior.
 # These objects are consumed by the system playbook and may reference entries in `vars/system/auth_servers/`.
-# Supported fields: `name`, `method`, `server_group`, `fallback_local`, and `state`.
+# Supported fields: `name`, `auth_order`, `password_policy`, `remote_roles`, and `state`.
 auth_configs:
   - name: radius-auth
-    method: radius
-    server_group: corporate-radius
-    fallback_local: true
+    auth_order:
+      - radius
+      - local
+    remote_roles:
+      - rolename: admin
+        remote_gid: 10
+        ldap_group: netops
+    password_policy:
+      min_length: 16
+      min_lower: 2
+      min_upper: 2
+      min_number: 2
+      min_special: 2
+      reject_username: true
+      apply_to_root: false
+      unlock_time: 60
     state: present
