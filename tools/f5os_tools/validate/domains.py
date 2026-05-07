@@ -12,6 +12,32 @@ def _name(item: dict) -> str | None:
     return item.get("name") or item.get("username") or item.get("user_name") or item.get("server")
 
 
+def _require_mapping(result: ValidationResult, path: Path, value: object, field_name: str, object_name: str | None) -> dict | None:
+    if not isinstance(value, dict):
+        result.add_error(path, f"`{field_name}` must be a mapping", object_name)
+        return None
+    return value
+
+
+def _require_list_of_mappings(
+    result: ValidationResult,
+    path: Path,
+    value: object,
+    field_name: str,
+    object_name: str | None,
+) -> list[dict] | None:
+    if not isinstance(value, list):
+        result.add_error(path, f"`{field_name}` must be a list", object_name)
+        return None
+    mappings: list[dict] = []
+    for index, entry in enumerate(value):
+        if not isinstance(entry, dict):
+            result.add_error(path, f"`{field_name}[{index}]` must be a mapping", object_name)
+            continue
+        mappings.append(entry)
+    return mappings
+
+
 def validate_bootstrap(result: ValidationResult) -> None:
     """Validate bootstrap var trees."""
     license_objects = collect_objects(VARS_ROOT / "bootstrap" / "license", "licenses", result)
@@ -57,18 +83,63 @@ def validate_system(result: ValidationResult) -> None:
     for path, item in logging_objects:
         if "servers" in item and not isinstance(item["servers"], list):
             result.add_error(path, "`servers` must be a list when provided", _name(item))
+            continue
+        for server in item.get("servers", []) or []:
+            if not isinstance(server, dict):
+                result.add_error(path, "`servers` entries must be mappings", _name(item))
+                continue
+            require_keys(result, path, server, ["address"], _name(item))
+            if "protocol" in server and server["protocol"] not in {"tcp", "udp"}:
+                result.add_error(path, "`servers.protocol` must be `tcp` or `udp`", _name(item))
+            log_entries = _require_list_of_mappings(result, path, server.get("logs", []), "servers.logs", _name(item))
+            for log_entry in log_entries or []:
+                require_keys(result, path, log_entry, ["facility", "severity"], _name(item))
 
     allowed_ip_objects = collect_objects(VARS_ROOT / "system" / "allowed_ips", "allowed_ip_sets", result)
     for path, item in allowed_ip_objects:
         require_keys(result, path, item, ["allowed"], _name(item))
         if not isinstance(item.get("allowed"), list):
             result.add_error(path, "`allowed` must be a list", _name(item))
+            continue
+        for allowed_entry in item["allowed"]:
+            if not isinstance(allowed_entry, dict):
+                result.add_error(path, "`allowed` entries must be mappings", _name(item))
+                continue
+            require_keys(result, path, allowed_entry, ["name"], _name(item))
+            has_ipv4 = "ipv4" in allowed_entry
+            has_ipv6 = "ipv6" in allowed_entry
+            if not (has_ipv4 or has_ipv6):
+                result.add_error(path, "allowed entry must define `ipv4` or `ipv6`", _name(item))
+            for address_family in ("ipv4", "ipv6"):
+                if address_family not in allowed_entry:
+                    continue
+                af_value = _require_mapping(result, path, allowed_entry[address_family], f"allowed.{address_family}", _name(item))
+                if not af_value:
+                    continue
+                require_keys(result, path, af_value, ["address", "prefix"], _name(item))
 
     auth_objects = collect_objects(VARS_ROOT / "system" / "auth", "auth_configs", result)
     for path, item in auth_objects:
         require_keys(result, path, item, ["auth_order"], _name(item))
         if "auth_order" in item and not isinstance(item["auth_order"], list):
             result.add_error(path, "`auth_order` must be a list", _name(item))
+        remote_roles = item.get("remote_roles", [])
+        if remote_roles and not isinstance(remote_roles, list):
+            result.add_error(path, "`remote_roles` must be a list", _name(item))
+        for role_entry in remote_roles if isinstance(remote_roles, list) else []:
+            if not isinstance(role_entry, dict):
+                result.add_error(path, "`remote_roles` entries must be mappings", _name(item))
+                continue
+            require_keys(result, path, role_entry, ["rolename"], _name(role_entry))
+            if "remote_gid" not in role_entry and "ldap_group" not in role_entry:
+                result.add_error(path, "remote role must define `remote_gid` or `ldap_group`", _name(item))
+        password_policy = item.get("password_policy")
+        if password_policy is not None:
+            policy = _require_mapping(result, path, password_policy, "password_policy", _name(item))
+            if policy:
+                for field_name in ("min_length", "min_lower", "min_upper", "min_number", "min_special", "unlock_time"):
+                    if field_name in policy and not isinstance(policy[field_name], int):
+                        result.add_error(path, f"`password_policy.{field_name}` must be an integer", _name(item))
 
     auth_server_objects = collect_objects(VARS_ROOT / "system" / "auth_servers", "auth_servers", result)
     auth_server_names: set[str] = set()
@@ -78,6 +149,12 @@ def validate_system(result: ValidationResult) -> None:
             auth_server_names.add(item["name"])
         if "server" in item and not isinstance(item["server"], list):
             result.add_error(path, "`server` must be a list", _name(item))
+            continue
+        for server_entry in item.get("server", []) or []:
+            if not isinstance(server_entry, dict):
+                result.add_error(path, "`server` entries must be mappings", _name(item))
+                continue
+            require_keys(result, path, server_entry, ["server_ip"], _name(item))
 
     # Warn when auth_order references remote providers without a matching server group.
     remote_providers = {"radius", "ldap", "tacacs"}
@@ -135,11 +212,32 @@ def validate_system(result: ValidationResult) -> None:
     tls_objects = collect_objects(VARS_ROOT / "system" / "tls", "tls_cert_keys", result)
     for path, item in tls_objects:
         require_keys(result, path, item, ["name"], _name(item))
+        if "key_type" in item and item["key_type"] not in {"rsa", "encrypted-rsa", "ecdsa", "encrypted-ecdsa"}:
+            result.add_error(path, "`key_type` must be a valid f5os_tls_cert_key choice", _name(item))
+        if item.get("key_type") in {"rsa", "encrypted-rsa"} and "key_size" in item and item["key_size"] not in {2048, 3072, 4096}:
+            result.add_error(path, "`key_size` must be 2048, 3072, or 4096", _name(item))
+        if item.get("key_type") in {"ecdsa", "encrypted-ecdsa"} and "key_curve" in item and item["key_curve"] not in {"prime256v1", "secp384r1"}:
+            result.add_error(path, "`key_curve` must be `prime256v1` or `secp384r1`", _name(item))
 
     snmp_objects = collect_objects(VARS_ROOT / "system" / "snmp", "snmp_configs", result)
     for path, item in snmp_objects:
         if not any(key in item for key in ("snmp_mib", "snmp_community", "snmp_target", "snmp_user")):
             result.add_error(path, "snmp object must define at least one snmp_* section", _name(item))
+        if "snmp_mib" in item:
+            _require_mapping(result, path, item["snmp_mib"], "snmp_mib", _name(item))
+        community_entries = _require_list_of_mappings(result, path, item.get("snmp_community", []), "snmp_community", _name(item)) if "snmp_community" in item else []
+        for community in community_entries or []:
+            require_keys(result, path, community, ["name"], _name(item))
+            if "security_model" in community and not isinstance(community["security_model"], list):
+                result.add_error(path, "`snmp_community.security_model` must be a list", _name(item))
+        target_entries = _require_list_of_mappings(result, path, item.get("snmp_target", []), "snmp_target", _name(item)) if "snmp_target" in item else []
+        for target in target_entries or []:
+            require_keys(result, path, target, ["name", "security_model"], _name(item))
+            if "ipv4_address" not in target and "ipv6_address" not in target:
+                result.add_error(path, "snmp_target entry must define `ipv4_address` or `ipv6_address`", _name(item))
+        user_entries = _require_list_of_mappings(result, path, item.get("snmp_user", []), "snmp_user", _name(item)) if "snmp_user" in item else []
+        for user in user_entries or []:
+            require_keys(result, path, user, ["name"], _name(item))
 
     imported_tls_objects = collect_objects(
         VARS_ROOT / "system" / "imported_tls",
@@ -378,6 +476,8 @@ def validate_software_lifecycle(result: ValidationResult) -> None:
         require_keys(result, path, item, ["remote_image_url"], _name(item))
         if "local_path" in item and item["local_path"] not in {"images/import", "images/staging", "images/tenant", "images"}:
             result.add_error(path, "`local_path` must be a valid f5os_system_image_import path", _name(item))
+        if "timeout" in item and not isinstance(item["timeout"], int):
+            result.add_error(path, "`timeout` must be an integer", _name(item))
 
     system_install_objects = collect_objects(
         VARS_ROOT / "software_lifecycle" / "system_installs",
@@ -387,6 +487,8 @@ def validate_software_lifecycle(result: ValidationResult) -> None:
     )
     for path, item in system_install_objects:
         require_keys(result, path, item, ["image_version"], _name(item))
+        if "timeout" in item and not isinstance(item["timeout"], int):
+            result.add_error(path, "`timeout` must be an integer", _name(item))
 
     tenant_image_objects = collect_objects(
         VARS_ROOT / "software_lifecycle" / "tenant_images",
@@ -402,6 +504,11 @@ def validate_software_lifecycle(result: ValidationResult) -> None:
             result.add_error(path, "`local_path` must be a valid f5os_tenant_image path", _name(item))
         if "protocol" in item and item["protocol"] not in {"scp", "sftp", "https"}:
             result.add_error(path, "`protocol` must be `scp`, `sftp`, or `https`", _name(item))
+        if item.get("state") in {"import", "present"}:
+            if "remote_host" not in item and item.get("state", "import") == "import":
+                result.add_warning(path, "tenant image import usually requires `remote_host`", _name(item))
+            if "remote_path" not in item and item.get("state", "import") == "import":
+                result.add_warning(path, "tenant image import usually requires `remote_path`", _name(item))
 
     velos_partition_image_objects = collect_objects(
         VARS_ROOT / "software_lifecycle" / "velos_partition_images",
@@ -415,6 +522,11 @@ def validate_software_lifecycle(result: ValidationResult) -> None:
             result.add_error(path, "VELOS partition image objects must target `velos-controller`", _name(item))
         if "protocol" in item and item["protocol"] not in {"scp", "sftp", "https"}:
             result.add_error(path, "`protocol` must be `scp`, `sftp`, or `https`", _name(item))
+        if item.get("state") in {"import", "present"}:
+            if "remote_host" not in item:
+                result.add_warning(path, "VELOS partition image workflow usually requires `remote_host`", _name(item))
+            if "remote_path" not in item:
+                result.add_warning(path, "VELOS partition image workflow usually requires `remote_path`", _name(item))
 
 
 def validate_observability(result: ValidationResult) -> None:
@@ -490,6 +602,9 @@ def validate_observability(result: ValidationResult) -> None:
     )
     for path, item in qkview_objects:
         require_keys(result, path, item, ["filename"], _name(item))
+        for field_name in ("max_core_size", "max_file_size", "timeout"):
+            if field_name in item and not isinstance(item[field_name], int):
+                result.add_error(path, f"`{field_name}` must be an integer", _name(item))
 
     config_backup_objects = collect_objects(
         VARS_ROOT / "observability" / "config_backups",
@@ -501,6 +616,11 @@ def validate_observability(result: ValidationResult) -> None:
         require_keys(result, path, item, ["name"], _name(item))
         if "protocol" in item and item["protocol"] not in {"https", "scp", "sftp"}:
             result.add_error(path, "`protocol` must be `https`, `scp`, or `sftp`", _name(item))
+        if item.get("state", "present") == "present":
+            if "remote_host" not in item:
+                result.add_warning(path, "config backup export usually requires `remote_host`", _name(item))
+            if "remote_path" not in item:
+                result.add_warning(path, "config backup export usually requires `remote_path`", _name(item))
 
 
 def validate_deletion_trees(result: ValidationResult) -> None:

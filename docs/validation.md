@@ -31,6 +31,20 @@ Current `make validate` behavior:
   - `playbooks/software_lifecycle.yml`
   - `playbooks/observability.yml`
 
+Current validator depth:
+
+- recursive fragment discovery and layered `settings.yml` inheritance
+- top-level collection and state checks
+- domain-specific field checks
+- selected nested schema checks for higher-risk object families such as:
+  - system logging
+  - allowed IPs
+  - auth and auth server objects
+  - TLS objects
+  - SNMP objects
+  - software lifecycle transport/state fields
+  - observability request shapes
+
 Current GitLab CI behavior:
 
 - `validate` stage installs `ansible-core`, `PyYAML`, and the `f5networks.f5os` collection when needed, then runs `make validate`
@@ -45,4 +59,4 @@ Air-gapped validation image:
 
 Known gap:
 
-- `validate-vars` is now implemented for the current domains, but it is still not full parity with the reference repo's deeper tree inheritance and field-model validation
+- `validate-vars` now covers the current runtime model with nested checks in several high-risk areas, but it is still not full parity with any future compiler/intent layers or live-device semantic validation

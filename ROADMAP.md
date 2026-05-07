@@ -5,6 +5,9 @@
 1. Extend validation depth as new domains land.
    - `validate-vars` already understands recursive var discovery and layered `settings.yml`.
    - Keep nested field models and cross-object references aligned with each implemented module surface.
+   - Remaining work:
+     - extend nested validation to more module-specific substructures as new object families appear
+     - add validation coverage for any future intent/compiler layers before claiming parity
    - Do not mark a domain complete if runtime schemas and validation schemas diverge.
 
 2. Add the remaining supporting documentation adapted from the BIG-IP repo where the workflow still applies.
