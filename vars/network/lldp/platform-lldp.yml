@@ -15,7 +15,7 @@ lldp_configs:
     tx_delay: 2
     max_neighbors_per_port: 10
     interfaces:
-      name: 1.0
+      name: "1.0"
       enabled: true
       tlv_advertisement_state: txrx
       tlv_map: chassis-id, port-id, ttl, system-name

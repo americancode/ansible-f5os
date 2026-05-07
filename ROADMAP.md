@@ -1,15 +1,5 @@
 # F5OS Enterprise GitOps Roadmap
 
-## To Do
-
-1. Extend validation depth as new domains land.
-   - `validate-vars` already understands recursive var discovery and layered `settings.yml`.
-   - Keep nested field models and cross-object references aligned with each implemented module surface.
-   - Remaining work:
-     - extend nested validation to more module-specific substructures as new object families appear
-     - add validation coverage for any future intent/compiler layers before claiming parity
-   - Do not mark a domain complete if runtime schemas and validation schemas diverge.
-
 ## Proposals
 
 1. Split `software_lifecycle` further if image import, install, and activation operations prove too risky to keep behind one playbook.

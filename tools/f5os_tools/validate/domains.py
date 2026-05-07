@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 from tools.f5os_tools.validate.models import ValidationResult
 from tools.f5os_tools.validate.tree import VARS_ROOT, collect_objects, require_keys, yaml_files
@@ -36,6 +37,9 @@ def _require_list_of_mappings(
             continue
         mappings.append(entry)
     return mappings
+
+
+_QOS_RANGE_RE = re.compile(r"^\d+(?:-\d+)?$")
 
 
 def validate_bootstrap(result: ValidationResult) -> None:
@@ -263,6 +267,15 @@ def validate_network(result: ValidationResult) -> None:
             interface_names.add(item["name"])
         if "trunk_vlans" in item and not isinstance(item["trunk_vlans"], list):
             result.add_error(path, "`trunk_vlans` must be a list", _name(item))
+        for vlan in item.get("trunk_vlans", []) if isinstance(item.get("trunk_vlans"), list) else []:
+            if not isinstance(vlan, int):
+                result.add_error(path, "`trunk_vlans` entries must be integers", _name(item))
+        if "native_vlan" in item and not isinstance(item["native_vlan"], int):
+            result.add_error(path, "`native_vlan` must be an integer", _name(item))
+        if "enabled" in item and not isinstance(item["enabled"], bool):
+            result.add_error(path, "`enabled` must be a boolean", _name(item))
+        if "forward_error_correction" in item and item["forward_error_correction"] not in {"auto", "enabled", "disabled"}:
+            result.add_error(path, "`forward_error_correction` must be `auto`, `enabled`, or `disabled`", _name(item))
 
     lag_objects = collect_objects(VARS_ROOT / "network" / "lags", "lags", result)
     lag_names: set[str] = set()
@@ -279,6 +292,17 @@ def validate_network(result: ValidationResult) -> None:
                 result.add_error(path, f"LAG member `{member}` is not defined under vars/network/interfaces", _name(item))
         if "trunk_vlans" in item and not isinstance(item["trunk_vlans"], list):
             result.add_error(path, "`trunk_vlans` must be a list", _name(item))
+        for vlan in item.get("trunk_vlans", []) if isinstance(item.get("trunk_vlans"), list) else []:
+            if not isinstance(vlan, int):
+                result.add_error(path, "`trunk_vlans` entries must be integers", _name(item))
+        if item.get("lag_type") not in {"lacp", "static"}:
+            result.add_error(path, "`lag_type` must be `lacp` or `static`", _name(item))
+        if "mode" in item and item["mode"] not in {"active", "passive"}:
+            result.add_error(path, "`mode` must be `active` or `passive`", _name(item))
+        if "interval" in item and item["interval"] not in {"slow", "fast"}:
+            result.add_error(path, "`interval` must be `slow` or `fast`", _name(item))
+        if "native_vlan" in item and not isinstance(item["native_vlan"], int):
+            result.add_error(path, "`native_vlan` must be an integer", _name(item))
 
     vlan_objects = collect_objects(VARS_ROOT / "network" / "vlans", "vlans", result)
     vlan_ids: set[int] = set()
@@ -302,10 +326,60 @@ def validate_network(result: ValidationResult) -> None:
             require_keys(result, path, item, ["name"], _name(item))
             if "interfaces" in item and not isinstance(item["interfaces"], dict):
                 result.add_error(path, "`interfaces` must be a dictionary", _name(item))
+                continue
+            if subdir == "lldp":
+                if "enabled" in item and not isinstance(item["enabled"], bool):
+                    result.add_error(path, "`enabled` must be a boolean", _name(item))
+                for field_name in ("max_neighbors_per_port", "reinitiate_delay", "tx_delay", "tx_hold", "tx_interval"):
+                    if field_name in item and not isinstance(item[field_name], int):
+                        result.add_error(path, f"`{field_name}` must be an integer", _name(item))
+                interface = item.get("interfaces")
+                if isinstance(interface, dict):
+                    if "enabled" in interface and not isinstance(interface["enabled"], bool):
+                        result.add_error(path, "`interfaces.enabled` must be a boolean", _name(item))
+                    if "tlv_advertisement_state" in interface and interface["tlv_advertisement_state"] not in {"rxonly", "txrx", "txonly", "none"}:
+                        result.add_error(path, "`interfaces.tlv_advertisement_state` must be a valid LLDP choice", _name(item))
+                    require_keys(result, path, interface, ["name"], _name(item))
+            if subdir == "stp":
+                for field_name in ("bridge_priority", "forwarding_delay", "hello_time", "hold_count", "max_age"):
+                    if field_name in item and not isinstance(item[field_name], int):
+                        result.add_error(path, f"`{field_name}` must be an integer", _name(item))
+                if "mode" in item and item["mode"] not in {"stp", "rstp", "mstp"}:
+                    result.add_error(path, "`mode` must be `stp`, `rstp`, or `mstp`", _name(item))
+                interface = item.get("interfaces")
+                if isinstance(interface, dict):
+                    require_keys(result, path, interface, ["name"], _name(item))
+                    if "edge_port" in interface and interface["edge_port"] not in {"EDGE_AUTO", "EDGE_ENABLE", "EDGE_DISABLE"}:
+                        result.add_error(path, "`interfaces.edge_port` must be a valid STP choice", _name(item))
+                    if "link_type" in interface and interface["link_type"] not in {"P2P", "SHARED"}:
+                        result.add_error(path, "`interfaces.link_type` must be `P2P` or `SHARED`", _name(item))
+                mstp_instances = item.get("mstp_instances")
+                if mstp_instances is not None:
+                    instances = _require_list_of_mappings(result, path, mstp_instances, "mstp_instances", _name(item))
+                    for instance in instances or []:
+                        require_keys(result, path, instance, ["instance_id"], _name(item))
+                        if "vlans" in instance and not isinstance(instance["vlans"], list):
+                            result.add_error(path, "`mstp_instances.vlans` must be a list", _name(item))
+                        for vlan in instance.get("vlans", []) if isinstance(instance.get("vlans"), list) else []:
+                            if not isinstance(vlan, int):
+                                result.add_error(path, "`mstp_instances.vlans` entries must be integers", _name(item))
+                        if "interface" in instance:
+                            inst_if = _require_mapping(result, path, instance["interface"], "mstp_instances.interface", _name(item))
+                            if inst_if:
+                                require_keys(result, path, inst_if, ["name"], _name(item))
+                                if "edge_port" in inst_if and inst_if["edge_port"] not in {"EDGE_AUTO", "EDGE_ENABLE", "EDGE_DISABLE"}:
+                                    result.add_error(path, "`mstp_instances.interface.edge_port` must be a valid STP choice", _name(item))
+                                if "link_type" in inst_if and inst_if["link_type"] not in {"P2P", "SHARED"}:
+                                    result.add_error(path, "`mstp_instances.interface.link_type` must be `P2P` or `SHARED`", _name(item))
 
 
 def validate_qos(result: ValidationResult) -> None:
     """Validate QoS var trees and cross-object references."""
+    qos_interface_refs = collect_objects(VARS_ROOT / "network" / "interfaces", "interfaces", result)
+    interface_names = {item["name"] for _, item in qos_interface_refs if isinstance(item.get("name"), str)}
+    qos_lag_refs = collect_objects(VARS_ROOT / "network" / "lags", "lags", result)
+    lag_names = {item["name"] for _, item in qos_lag_refs if isinstance(item.get("name"), str)}
+
     traffic_priority_objects = collect_objects(
         VARS_ROOT / "qos" / "traffic_priorities",
         "traffic_priorities",
@@ -330,12 +404,18 @@ def validate_qos(result: ValidationResult) -> None:
             result.add_error(path, "mapping references an unknown traffic priority", _name(item))
         if "mapping_values" in item and not isinstance(item["mapping_values"], list):
             result.add_error(path, "`mapping_values` must be a list", _name(item))
+        for mapping_value in item.get("mapping_values", []) if isinstance(item.get("mapping_values"), list) else []:
+            if not isinstance(mapping_value, str) or not _QOS_RANGE_RE.match(mapping_value):
+                result.add_error(path, "`mapping_values` entries must be strings like `5` or `2-3`", _name(item))
 
     meter_group_objects = collect_objects(VARS_ROOT / "qos" / "meter_groups", "meter_groups", result)
     for path, item in meter_group_objects:
         require_keys(result, path, item, ["name"], _name(item))
         if "interfaces" in item and not isinstance(item["interfaces"], list):
             result.add_error(path, "`interfaces` must be a list", _name(item))
+        for interface_name in item.get("interfaces", []) if isinstance(item.get("interfaces"), list) else []:
+            if interface_name not in interface_names and interface_name not in lag_names:
+                result.add_error(path, f"meter group interface `{interface_name}` is not a known interface or LAG", _name(item))
         if "meters" in item and not isinstance(item["meters"], list):
             result.add_error(path, "`meters` must be a list", _name(item))
             continue

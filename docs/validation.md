@@ -46,6 +46,8 @@ Current validator depth:
   - auth and auth server objects
   - TLS objects
   - SNMP objects
+  - network interface, LAG, LLDP, and STP nested structures
+  - QoS mapping and meter-group reference shapes
   - software lifecycle transport/state fields
   - observability request shapes
 
@@ -63,4 +65,4 @@ Air-gapped validation image:
 
 Known gap:
 
-- `validate-vars` now covers the current runtime model with nested checks in several high-risk areas, but it is still not full parity with any future compiler/intent layers or live-device semantic validation
+- `validate-vars` now covers the repo's current runtime model, but it still does not validate any future compiler/intent layers or live-device semantic behavior

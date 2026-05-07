@@ -11,6 +11,6 @@ lags:
     trunk_vlans:
       - 110
     config_members:
-      - 1.0
-      - 1.1
+      - "1.0"
+      - "1.1"
     state: present

@@ -4,12 +4,12 @@
 # Supported fields: `name`, `description`, `enabled`, `forward_error_correction`,
 # `native_vlan`, `trunk_vlans`, and `state`.
 interfaces:
-  - name: 1.0
+  - name: "1.0"
     enabled: true
     description: uplink-a
     forward_error_correction: auto
     state: present
-  - name: 1.1
+  - name: "1.1"
     enabled: true
     description: uplink-b
     forward_error_correction: auto
