@@ -10,12 +10,7 @@
      - add validation coverage for any future intent/compiler layers before claiming parity
    - Do not mark a domain complete if runtime schemas and validation schemas diverge.
 
-2. Add the remaining supporting documentation adapted from the BIG-IP repo where the workflow still applies.
-   - AWX operating model and bootstrap handoff docs
-   - tenant lifecycle docs covering image upload, tenant creation, wait sequencing, tenant-console access, and safe delete/update patterns
-   - domain usage examples as each remaining domain is implemented
-
-3. Add repository tooling and developer ergonomics to match the reference repo's standard.
+2. Add repository tooling and developer ergonomics to match the reference repo's standard.
    - Python packaging and lint/test targets for helper tools
    - `audit_mode` support across canonical playbooks
    - keep local validation and CI behavior aligned as the repo grows

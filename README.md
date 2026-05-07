@@ -32,4 +32,10 @@ Platform targeting uses the repo-standard selectors documented in [docs/platform
 
 Example host inventory is in [examples/inventory/hosts.yml](examples/inventory/hosts.yml).
 
+Operator docs:
+
+- [docs/awx-operating-model.md](docs/awx-operating-model.md)
+- [docs/bootstrap-handoff.md](docs/bootstrap-handoff.md)
+- [docs/tenant-lifecycle.md](docs/tenant-lifecycle.md)
+
 Start with [ROADMAP.md](ROADMAP.md).
