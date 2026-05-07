@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ansible-f5os-tools"
+version = "0.1.0"
+description = "Helper tooling for the ansible-f5os GitOps repository"
+requires-python = ">=3.11"
+dependencies = [
+  "PyYAML",
+]
+
+[project.scripts]
+f5os-tools = "tools.f5os_tools.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tools*", "filter_plugins*"]

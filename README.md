@@ -38,4 +38,11 @@ Operator docs:
 - [docs/bootstrap-handoff.md](docs/bootstrap-handoff.md)
 - [docs/tenant-lifecycle.md](docs/tenant-lifecycle.md)
 
+Developer entrypoints:
+
+- `make validate`
+- `make validate-vars`
+- `make lint`
+- `make test`
+
 Start with [ROADMAP.md](ROADMAP.md).

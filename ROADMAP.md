@@ -10,11 +10,6 @@
      - add validation coverage for any future intent/compiler layers before claiming parity
    - Do not mark a domain complete if runtime schemas and validation schemas diverge.
 
-2. Add repository tooling and developer ergonomics to match the reference repo's standard.
-   - Python packaging and lint/test targets for helper tools
-   - `audit_mode` support across canonical playbooks
-   - keep local validation and CI behavior aligned as the repo grows
-
 ## Proposals
 
 1. Split `software_lifecycle` further if image import, install, and activation operations prove too risky to keep behind one playbook.

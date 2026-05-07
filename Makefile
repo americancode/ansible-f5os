@@ -4,12 +4,18 @@ ANSIBLE_REMOTE_TEMP ?= .ansible/tmp
 ANSIBLE_COLLECTIONS_PATH ?= $(CURDIR)/.ansible/collections:/opt/ansible/collections
 VALIDATION_IMAGE ?= ansible-f5os-validation:latest
 
-.PHONY: validate validate-vars validate-ansible validate-image-build validate-image-run
+.PHONY: validate validate-vars validate-ansible lint test validate-image-build validate-image-run
 
-validate: validate-vars validate-ansible
+validate: validate-vars lint test validate-ansible
 
 validate-vars:
 	$(PYTHON) tools/validate-vars.py
+
+lint:
+	$(PYTHON) -m py_compile tools/validate-vars.py tools/f5os_tools/*.py tools/f5os_tools/validate/*.py filter_plugins/f5os_var_filters.py filter_plugins/f5os_filters/*.py
+
+test:
+	$(PYTHON) -m unittest discover -s tests -p 'test_*.py'
 
 validate-ansible:
 	mkdir -p $(ANSIBLE_LOCAL_TEMP) $(ANSIBLE_REMOTE_TEMP)

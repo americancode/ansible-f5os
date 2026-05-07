@@ -7,6 +7,8 @@ Current local entrypoints:
 - `make validate`
 - `make validate-vars`
 - `make validate-ansible`
+- `make lint`
+- `make test`
 
 Direct script entrypoints still exist:
 
@@ -22,6 +24,8 @@ Current `make validate` behavior:
   - `tenants`
   - `software_lifecycle`
   - `observability`
+- runs Python syntax checks for repo helper tooling and filter modules
+- runs unit tests for repo-local helper behavior
 - runs `ansible-playbook --syntax-check` for:
   - `playbooks/bootstrap.yml`
   - `playbooks/system.yml`
